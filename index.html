@@ -16,7 +16,7 @@
         }
         
         body { 
-            font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, "Apple LiGothic Medium", "Microsoft JhengHei", sans-serif; 
+            font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif; 
             background-color: var(--butter); 
             margin: 0; 
             padding: 0; 
@@ -24,6 +24,7 @@
             -webkit-tap-highlight-color: transparent; 
         }
         
+        /* 🧭 上置型文青導覽列 */
         .nav-bar { 
             background: var(--butter); border-bottom: 1px solid var(--milk-tea); display: flex; justify-content: space-around; align-items: center; position: sticky; top: 0; z-index: 9999;
         }
@@ -47,9 +48,16 @@
         }
         .header img { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--rose-cream); object-fit: cover; }
         
-        .category-container { display: flex; justify-content: center; gap: 15px; padding: 12px 0 6px 0; }
-        .cat-tab { font-size: 12px; padding: 4px 10px; border-radius: 12px; cursor: pointer; border: 1px solid transparent; opacity: 0.6; transition: 0.2s; }
-        .cat-tab.active { opacity: 1; background-color: white; border-color: var(--rose-cream); color: var(--rose-dark); }
+        /* 🏷️ 分類橫條：新增「所有商品」並支援滑動 */
+        .category-wrapper {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 12px 10px 6px 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .category-container { display: inline-flex; gap: 10px; min-width: 100%; justify-content: center; }
+        .cat-tab { font-size: 11px; padding: 5px 12px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; opacity: 0.5; transition: 0.2s; background: rgba(255,255,255,0.5); }
+        .cat-tab.active { opacity: 1; background-color: white; border-color: var(--rose-cream); color: var(--rose-dark); font-weight: bold; }
 
         .container { padding: 12px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
         .page { display: none; }
@@ -70,12 +78,12 @@
             background: transparent; color: var(--rose-dark); border: 1px solid var(--rose-cream); padding: 5px; border-radius: 4px; font-size: 11px; letter-spacing: 1px; cursor: pointer; flex-grow: 1; transition: 0.2s;
         }
         .add-cart-btn:active { background: var(--milk-tea); }
-        .add-cart-btn:disabled { border-color: #eee; color: #ccc; background: #fafafa; cursor: not-allowed; }
+        .add-cart-btn:disabled { border-color: #eee; color: #ccc; background: #fafafa; }
 
         .cart-item, .order-item { background: white; padding: 12px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--milk-tea); }
         .order-meta { display: flex; justify-content: space-between; font-size: 11px; color: #9e908a; margin-bottom: 6px; align-items: center; }
         
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
         .badge.not-yet { background: #f2ece9; color: #9e908a; } 
         .badge.success { background: #e6ede9; color: #6b8e76; } 
         .badge.oos { background: #f9ebea; color: #c0392b; }     
@@ -86,12 +94,10 @@
         .summary-card { background: white; border: 1px solid var(--rose-cream); padding: 16px; border-radius: 6px; text-align: center; margin-top: 12px; }
         .summary-price { font-size: 20px; font-weight: bold; color: var(--rose-dark); margin: 4px 0; }
 
-        /* 📋 教學內頁極簡美學排版 */
-        .guide-box { background: white; border-radius: 6px; padding: 18px; border: 1px solid var(--milk-tea); font-size: 13px; color: var(--mocha); line-height: 1.8; letter-spacing: 0.5px; }
+        .guide-box { background: white; border-radius: 6px; padding: 18px; border: 1px solid var(--milk-tea); font-size: 13px; color: var(--mocha); line-height: 1.8; }
         .guide-box h4 { margin: 16px 0 6px 0; color: var(--rose-dark); font-weight: 500; font-size: 13px; letter-spacing: 1px; }
-        .guide-box p { margin: 0 0 12px 0; }
         .lele-btn { display: block; text-align: center; background: var(--rose-cream); color: white; border: none; padding: 12px; border-radius: 4px; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 16px; width: 100%; cursor: pointer; letter-spacing: 1px; }
-        .lele-btn:disabled { background: #e0e0e0; color: #aaa; cursor: not-allowed; }
+        .lele-btn:disabled { background: #e0e0e0; color: #aaa; }
         
         #global-status { text-align: center; padding: 6px; font-size: 11px; color: #9e908a; }
     </style>
@@ -108,7 +114,7 @@
         <div class="nav-item" id="nav-guide" onclick="switchPage('guide')">結單教學</div>
     </div>
 
-    <div class="timer-banner" id="timer-display">連線計時同步中...</div>
+    <div class="timer-banner" id="timer-display">正在同步連線時程...</div>
 
     <div class="header">
         <img id="userPicture" src="https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop" alt="Avatar">
@@ -119,27 +125,29 @@
         <div id="global-status">連線線路準備就緒</div>
 
         <div id="page-products" class="page active">
-            <div class="category-container">
-                <div class="cat-tab active" id="cat-all" onclick="filterCategory('all')">全部</div>
-                <div class="cat-tab" id="cat-normal" onclick="filterCategory('一般')">一般</div>
-                <div class="cat-tab" id="cat-beauty" onclick="filterCategory('藥妝')">藥妝</div>
-                <div class="cat-tab" id="cat-clothes" onclick="filterCategory('衣服')">衣服</div>
-                <div class="cat-tab" id="cat-ip" onclick="filterCategory('IP')">IP</div>
+            <div class="category-wrapper">
+                <div class="category-container">
+                    <div class="cat-tab active" id="cat-all" onclick="filterCategory('all')">所有商品</div>
+                    <div class="cat-tab" id="cat-normal" onclick="filterCategory('一般')">一般</div>
+                    <div class="cat-tab" id="cat-beauty" onclick="filterCategory('藥妝')">藥妝</div>
+                    <div class="cat-tab" id="cat-clothes" onclick="filterCategory('衣服')">衣服</div>
+                    <div class="cat-tab" id="cat-ip" onclick="filterCategory('IP')">IP</div>
+                </div>
             </div>
             <div id="products-list" class="products-grid"></div>
         </div>
 
         <div id="page-orders" class="page">
-            <h3 style="margin-top:0; font-size: 13px; font-weight: 400;">現場已配單明細</h3>
+            <h3 style="margin-top:0; font-size: 13px; font-weight: 400; letter-spacing: 1px;">現場已配單明細</h3>
             <div id="orders-list">正在讀取配單紀錄...</div>
         </div>
 
         <div id="page-checkout" class="page">
-            <h3 style="margin-top:0; font-size: 13px; font-weight: 400;">待確認連線項目</h3>
+            <h3 style="margin-top:0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">待確認連線項目</h3>
             <div id="cart-list"></div>
             
             <div class="summary-card">
-                <div style="font-size: 11px;">預計結單總金額</div>
+                <div style="font-size: 11px; letter-spacing: 1px;">預計結單總金額</div>
                 <div class="summary-price">NT$ <span id="checkout-total">0</span></div>
                 <input type="text" id="global-note" class="note-input" placeholder="新增備註（選填）">
                 <button class="submit-all-btn" id="submitAllBtn" onclick="submitFinalOrder()">確認無誤，送出訂單</button>
@@ -147,13 +155,13 @@
         </div>
 
         <div id="page-guide" class="page">
-            <h3 style="margin-top:0; font-size: 13px; font-weight: 400;">現場連線結單說明</h3>
+            <h3 style="margin-top:0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">現場連線結單說明</h3>
             <div class="guide-box">
                 <h4>1. 現場連線直接結單</h4>
-                <p>若您希望直接單獨結清本次日韓連線採買的商品，請於「我的訂單」確認採買狀態後，直接私訊 LINE 官方帳號 <b>@514pfcah</b> 索取 7-11 賣貨便下單連結，並依照網頁顯示之結單總金額進行下單，下單時請務必於備註欄填入您的綽號以利小幫手對帳。</p>
+                <p>若您希望直接單獨結清本次採買商品，請於「我的訂單」確認採買狀態後，直接私訊 LINE 官方帳號 <b>@514pfcah</b> 索取賣貨便連結。請依照系統顯示之結單總額下單，並務必於備註欄填入您的綽號。</p>
                 
                 <h4>2. 轉入樂樂系統合併結單</h4>
-                <p>若您希望將本次連線成功的商品，與您先前在樂樂後台已有的常態商品一併合併對帳、打包寄出，請直接點擊下方按鈕申請轉入。轉入成功後，此處的明細將由小幫手統一匯入樂樂後台與其他商品一同結單。</p>
+                <p>若您希望將本次連線成功的商品，與您先前在樂樂後台已有的訂單合併對帳打包，請點擊下方按鈕申請轉入。轉入後，此處的明細將由小幫手統一匯入樂樂後台與其他商品一同結單。</p>
                 
                 <button id="leleBtn" onclick="requestLeleMerge()" class="lele-btn">申請合併至樂樂系統</button>
             </div>
@@ -164,6 +172,7 @@
     const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
     const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbx3gGQGYNs0EtM8hqbRxeUPR8kkQXy823jDXr5S0QdYRTJgQg0ls4tCeO8-wTNFuXc/exec"; 
 
+    // ⏳ 呼呼可以在這裡修改截止時間
     const CLOSING_TIME = new Date("2026-06-15T23:59:59+08:00"); 
 
     let userLineId = "Ubd06fad9646f3ac3d06b6565703bd30e"; 
@@ -223,9 +232,7 @@
             }
             loadProductsFromServer();
             silentLoadOrders(); 
-        } catch (err) {
-            loadProductsFromServer();
-        }
+        } catch (err) { loadProductsFromServer(); }
     }
 
     async function loadProductsFromServer() {
@@ -242,11 +249,8 @@
         currentSelectedCategory = catName;
         document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
         
-        if(catName === 'all') document.getElementById('cat-all').classList.add('active');
-        else if(catName === '一般') document.getElementById('cat-normal').classList.add('active');
-        else if(catName === '藥妝') document.getElementById('cat-beauty').classList.add('active');
-        else if(catName === '衣服') document.getElementById('cat-clothes').classList.add('active');
-        else if(catName === 'IP') document.getElementById('cat-ip').classList.add('active');
+        const tabs = { 'all': 'cat-all', '一般': 'cat-normal', '藥妝': 'cat-beauty', '衣服': 'cat-clothes', 'IP': 'cat-ip' };
+        if (tabs[catName]) document.getElementById(tabs[catName]).classList.add('active');
 
         let filtered = productsCache;
         if (catName !== "all") { filtered = productsCache.filter(p => p.status === catName); }
@@ -258,7 +262,7 @@
         container.innerHTML = "";
         
         if(!list || list.length === 0) {
-            container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>此分類目前沒有商品上架。</div>";
+            container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>此分類目前沒有商品。</div>";
             return;
         }
 
@@ -296,7 +300,7 @@
         let existing = myCart.find(item => item.productName === pName && item.spec === spec);
         if(existing) { existing.qty += qty; } else { myCart.push({ productName: pName, price: price, spec: spec, qty: qty }); }
         updateCartBadge();
-        alert(`已加入待確認連線項目。`);
+        alert(`已成功加單。`);
     }
 
     function updateCartBadge() {
@@ -311,7 +315,7 @@
         list.innerHTML = "";
         
         if(myCart.length === 0) {
-            list.innerHTML = "<div style='text-align:center; color:var(--mocha); font-size:12px; padding:30px;'>目前無待確認項目。</div>";
+            list.innerHTML = "<div style='text-align:center; color:var(--mocha); font-size:12px; padding:30px;'>目前無待加單項目。</div>";
             totalSpan.innerText = "0";
             return;
         }
@@ -329,7 +333,7 @@
                 <div style="font-size:12px; margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
                     <span style="opacity:0.7;">規格: ${item.spec}</span>
                     <div>
-                        數量: <input type="number" value="${item.qty}" min="1" style="width:35px; text-align:center;" onchange="updateCartQty(${idx}, this.value)">
+                        數量: <input type="number" value="${item.qty}" min="1" style="width:35px; text-align:center; border:1px solid #ccc;" onchange="updateCartQty(${idx}, this.value)">
                         <button onclick="removeFromCart(${idx})" style="background:none; border:none; color:var(--rose-dark); cursor:pointer; margin-left:10px; font-size:12px;">移除</button>
                     </div>
                 </div>
@@ -346,22 +350,13 @@
         if(myCart.length === 0) return;
         const btn = document.getElementById("submitAllBtn");
         const globalNote = document.getElementById("global-note").value.trim();
-        
         btn.disabled = true;
-        btn.innerText = "正在傳送清單...";
-
+        btn.innerText = "正在傳送...";
         let uploadItems = myCart.map(item => { return { productName: item.productName, spec: item.spec, qty: item.qty, note: globalNote }; });
-
         try {
-            fetch(MY_GAS_URL, {
-                method: "POST",
-                body: JSON.stringify({ lineId: userLineId, lineName: userLineName, items: uploadItems })
-            });
-            
-            alert("清單已同步傳送。");
-            myCart = []; 
-            updateCartBadge();
-            switchPage('orders'); 
+            fetch(MY_GAS_URL, { method: "POST", body: JSON.stringify({ lineId: userLineId, lineName: userLineName, items: uploadItems }) });
+            alert("加單成功，請至我的訂單追蹤狀態。");
+            myCart = []; updateCartBadge(); switchPage('orders'); 
         } catch(err) { alert("網路傳送失敗"); }
         finally { btn.disabled = false; btn.innerText = "確認無誤，送出訂單"; }
     }
@@ -369,33 +364,18 @@
     async function requestLeleMerge() {
         const leleBtn = document.getElementById("leleBtn");
         let confirmedOrders = loadedOrdersCache.filter(o => o.status === "已購買" || o.status === "已收到");
-        
-        if(confirmedOrders.length === 0) { 
-            alert("目前沒有已成功的採買明細可供合併。"); 
-            return; 
-        }
-
+        if(confirmedOrders.length === 0) { alert("目前查無採買成功之商品，無法申請合併。"); return; }
         leleBtn.disabled = true;
-        leleBtn.innerText = "正在打包明細...";
-
+        leleBtn.innerText = "打包中...";
         let detailsString = confirmedOrders.map(o => `【${o.productName}/${o.spec} x${o.qty}】`).join(" , ");
-
         try {
             fetch(MY_GAS_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify({
-                    action: "submitLeleMerge", lineId: userLineId, lineName: userLineName,
-                    itemDetails: detailsString, totalAmount: totalOrdersAmountCache, note: "網頁端發起合併"
-                })
+                method: "POST", headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ action: "submitLeleMerge", lineId: userLineId, lineName: userLineName, itemDetails: detailsString, totalAmount: totalOrdersAmountCache, note: "買家網頁申請" })
             });
-            
-            alert("已傳送要求");
+            alert("已傳送合併要求");
             leleBtn.innerText = "已成功傳送合併要求";
-        } catch(err) {
-            alert("傳送失敗");
-            leleBtn.disabled = false;
-        }
+        } catch(err) { alert("要求失敗"); leleBtn.disabled = false; }
     }
 
     async function silentLoadOrders() {
@@ -408,38 +388,22 @@
 
     async function loadUserOrders() {
         const orderContainer = document.getElementById("orders-list");
-        orderContainer.innerHTML = "<div style='text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>同步最新配單狀態...</div>";
+        orderContainer.innerHTML = "<div style='text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>同步最新狀態...</div>";
         try {
             const response = await fetch(`${MY_GAS_URL}?type=getOrders&lineId=${userLineId}`);
             const data = await response.json();
             orderContainer.innerHTML = "";
-            
             if (!data.orders || data.orders.length === 0) {
-                orderContainer.innerHTML = "<div style='text-align:center; color:var(--mocha); font-size:12px; padding:30px;'>目前尚無現場配單紀錄。</div>";
+                orderContainer.innerHTML = "<div style='text-align:center; color:var(--mocha); font-size:12px; padding:30px;'>目前無現場加單紀錄。</div>";
                 return;
             }
-
-            loadedOrdersCache = data.orders;
-            totalOrdersAmountCache = data.total;
-
+            loadedOrdersCache = data.orders; totalOrdersAmountCache = data.total;
             data.orders.forEach(o => {
-                const item = document.createElement("div");
-                item.className = "order-item";
-                
+                const item = document.createElement("div"); item.className = "order-item";
                 let statusClass = "not-yet";
                 if(o.status === "已購買" || o.status === "已收到") statusClass = "success";
                 if(o.status === "斷貨" || o.status === "沒買到") statusClass = "oos";
-
-                item.innerHTML = `
-                    <div class="order-meta">
-                        <span>${o.time}</span>
-                        <span class="badge ${statusClass}">${o.status}</span>
-                    </div>
-                    <div style="font-weight:400; font-size:13px;">${o.productName}</div>
-                    <div style="font-size:11px; opacity:0.7; margin-top:4px;">規格: ${o.spec} / 數量: ${o.qty}</div>
-                    ${o.note ? `<div style="font-size:11px; background:#f4eae4; padding:6px; margin-top:6px;">備註: ${o.note}</div>` : ''}
-                    <div style="text-align:right; font-weight:bold; color:var(--rose-dark); font-size:13px; margin-top:2px;">$${o.price}</div>
-                `;
+                item.innerHTML = `<div class="order-meta"><span>${o.time}</span><span class="badge ${statusClass}">${o.status}</span></div><div style="font-weight:400; font-size:13px;">${o.productName}</div><div style="font-size:11px; opacity:0.7; margin-top:4px;">規格: ${o.spec} / 數量: ${o.qty}</div>${o.note ? `<div style="font-size:11px; background:#f4eae4; padding:6px; margin-top:6px;">備註: ${o.note}</div>` : ''}<div style="text-align:right; font-weight:bold; color:var(--rose-dark); font-size:13px; margin-top:2px;">$${o.price}</div>`;
                 orderContainer.appendChild(item);
             });
         } catch (err) { orderContainer.innerHTML = "讀取失敗。"; }
