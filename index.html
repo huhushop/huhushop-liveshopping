@@ -61,27 +61,33 @@
     let userLineId = "";
     let userLineName = "";
 
-    // 初始化 LINE LIFF
+  // 初始化 LINE LIFF（加強抓錯版）
     async function initLiff() {
+        const statusDiv = document.getElementById("status");
         try {
+            statusDiv.innerText = "正在嘗試連線 LINE 總部...";
             await liff.init({ liffId: MY_LIFF_ID });
+            
+            statusDiv.innerText = "連線成功，正在驗證登入狀態...";
             if (!liff.isLoggedIn()) {
-                liff.login(); // 如果沒登入，自動彈出登入畫面
+                statusDiv.innerText = "偵測到未登入，正在跳轉 LINE 登入畫面...";
+                liff.login(); 
             } else {
+                statusDiv.innerText = "登入成功，正在讀取您的個人資料...";
                 const profile = await liff.getProfile();
                 userLineId = profile.userId;
                 userLineName = profile.displayName;
                 
-                // 將資料渲染到網頁畫面上
                 document.getElementById("userName").innerText = userLineName;
                 document.getElementById("userPicture").src = profile.pictureUrl;
-                document.getElementById("status").innerText = "LINE 連線成功，可以下單囉！";
+                statusDiv.innerText = "🟢 LINE 連線成功，可以下單囉！";
             }
         } catch (error) {
-            document.getElementById("status").innerText = "LIFF 初始化失敗: " + error;
+            // 💥 這裡最重要！如果失敗，直接把 LINE 給的吐血原因寫在手機螢幕上
+            document.getElementById("userName").innerText = "❌ 讀取失敗";
+            statusDiv.innerHTML = "<span style='color:red;'>LIFF 錯誤原因: " + error.message + "<br>詳細資訊: " + JSON.stringify(error) + "</span>";
         }
     }
-
     // 點擊下單按鈕的動作
     async function submitOrder() {
         const productName = document.getElementById("productName").value;
