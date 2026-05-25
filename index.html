@@ -3,149 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HuHuShop 呼來選品 mini</title>
+    <title>HuHuShop 呼來選品</title>
     <script src="https://charset.net.tw/cdnjs/ajax/libs/liff/2.23.0/sdk.js"></script>
     <style>
         :root {
-            --primary: #f3cbd0;
-            --primary-dark: #e2a1a8;
-            --accent: #fff5f6;
-            --bg: #fbf9f7;
-            --card-bg: #ffffff;
-            --text: #5c4f4e;
-            --gray: #b5a7a6;
-            --success: #a3c9b8;
+            --milk-tea: #f4eae4;      /* 奶油奶茶底色 */
+            --butter: #fbf7f4;        /* 極簡淺奶白 */
+            --mocha: #6d5f5a;         /* 文青深焙灰褐（主文字） */
+            --rose-cream: #e6c5bf;    /* 溫柔奶茶粉（點綴與主要按鈕） */
+            --rose-dark: #cc9f97;     /* 深奶茶粉 */
+            --soft-gray: #d9cfca;     /* 淡灰褐邊框 */
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text); padding-bottom: 90px; -webkit-tap-highlight-color: transparent; }
         
-        /* 🎀 頂部橫條 */
-        .header { background: var(--card-bg); padding: 15px; text-align: center; font-weight: bold; font-size: 16px; border-bottom: 2px dashed var(--primary); display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .header img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+        body { 
+            font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, "Apple LiGothic Medium", "Microsoft JhengHei", sans-serif; 
+            background-color: var(--butter); 
+            margin: 0; 
+            padding: 0; 
+            color: var(--mocha); 
+            -webkit-tap-highlight-color: transparent; 
+        }
         
-        .container { padding: 12px; max-width: 600px; margin: 0 auto; }
+        /* 🎀 頂部文青品牌識別區 */
+        .header { 
+            background: var(--butter); 
+            padding: 16px; 
+            text-align: center; 
+            font-size: 15px; 
+            letter-spacing: 2px;
+            font-weight: 300;
+            border-bottom: 1px solid var(--milk-tea); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+        }
+        .header img { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--rose-cream); object-fit: cover; }
+        
+        /* 🧭 選單完美移轉至最上方 */
+        .nav-bar { 
+            background: var(--butter); 
+            border-bottom: 1px solid var(--milk-tea); 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+        }
+        .nav-item { 
+            padding: 14px 0;
+            font-size: 13px; 
+            color: var(--mocha); 
+            opacity: 0.6;
+            cursor: pointer; 
+            width: 25%; 
+            text-align: center;
+            letter-spacing: 1px;
+            position: relative; 
+            transition: 0.2s;
+        }
+        .nav-item.active { 
+            opacity: 1;
+            font-weight: bold; 
+        }
+        /* 極簡文青下底線細節 */
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 30%;
+            right: 30%;
+            height: 2px;
+            background-color: var(--rose-dark);
+        }
+        .cart-badge { 
+            position: absolute; 
+            top: 8px; 
+            right: 12%; 
+            background: var(--rose-dark); 
+            color: white; 
+            border-radius: 8px; 
+            padding: 1px 5px; 
+            font-size: 9px; 
+            font-weight: bold; 
+        }
+
+        .container { padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
         .page { display: none; }
         .page.active { display: block; }
         
-        /* 🎀 雙欄方格佈局 */
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .product-card { background: var(--card-bg); border-radius: 16px; border: 1px solid #f2ece9; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(142,120,115,0.04); position: relative; }
-        .product-img { width: 100%; height: 130px; object-fit: cover; background-color: var(--accent); }
-        .product-body { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; gap: 6px; }
-        .product-title { font-size: 14px; font-weight: bold; line-height: 1.4; height: 38px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .product-price { color: var(--primary-dark); font-weight: 800; font-size: 15px; }
+        /* 🎀 日式微風雙欄方格 */
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .product-card { 
+            background: white; 
+            border-radius: 8px; 
+            border: 1px solid var(--milk-tea); 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            transition: 0.3s;
+        }
+        .product-img { width: 100%; height: 140px; object-fit: cover; background-color: var(--milk-tea); }
+        .product-body { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; gap: 8px; }
+        .product-title { font-size: 13px; font-weight: 400; line-height: 1.5; height: 38px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; letter-spacing: 0.5px; }
+        .product-price { color: var(--rose-dark); font-weight: bold; font-size: 14px; }
         
-        /* 下單元素 */
-        .select-spec { width: 100%; padding: 6px; border-radius: 8px; border: 1px solid #e5dbd9; font-size: 12px; color: var(--text); background-color: #fffdec; outline: none; }
-        .qty-row { display: flex; align-items: center; justify-content: space-between; gap: 5px; margin-top: 2px; }
-        .qty-input { width: 45px; text-align: center; padding: 5px; border-radius: 6px; border: 1px solid #e5dbd9; font-size: 13px; font-weight: bold; color: var(--text); }
-        .add-cart-btn { background: var(--primary); color: white; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px; flex-grow: 1; box-shadow: 0 2px 6px rgba(243,203,208,0.4); }
-        .add-cart-btn:disabled { background: #e0e0e0; box-shadow: none; color: #aaa; }
-
-        /* 📋 訂單與購物車樣式 */
-        .cart-item, .order-item { background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #f2ece9; }
-        .order-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray); margin-bottom: 6px; }
-        .badge { padding: 2px 6px; border-radius: 6px; font-size: 11px; font-weight: bold; background: #eee; }
-        .badge.success { background: #e8f5e9; color: #5cb85c; }
+        /* 規格與數量箭頭選單修正 */
+        .select-spec { width: 100%; padding: 6px; border-radius: 4px; border: 1px solid var(--soft-gray); font-size: 12px; color: var(--mocha); background-color: white; outline: none; }
+        .qty-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+        .qty-input { width: 42px; text-align: center; padding: 5px; border-radius: 4px; border: 1px solid var(--soft-gray); font-size: 12px; color: var(--mocha); }
         
-        .note-input { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #e5dbd9; box-sizing: border-box; font-size: 13px; margin-top: 5px; }
-        .submit-all-btn { background: #e2a1a8; color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 12px rgba(226,161,168,0.4); }
+        /* 文青感輕奢細線按鈕 */
+        .add-cart-btn { 
+            background: transparent; 
+            color: var(--rose-dark); 
+            border: 1px solid var(--rose-cream); 
+            padding: 6px; 
+            border-radius: 4px; 
+            font-size: 11px; 
+            letter-spacing: 1px;
+            cursor: pointer; 
+            flex-grow: 1; 
+            transition: 0.2s;
+        }
+        .add-cart-btn:active { background: var(--milk-tea); }
+        .add-cart-btn:disabled { border-color: #eee; color: #ccc; }
 
-        .summary-card { background: #fffdfd; border: 2px dashed var(--primary); padding: 20px; border-radius: 16px; text-align: center; margin-top: 15px; }
-        .summary-price { font-size: 26px; font-weight: 900; color: var(--primary-dark); margin: 8px 0; }
+        /* 📋 內頁清單極簡化 */
+        .cart-item, .order-item { background: white; padding: 14px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--milk-tea); }
+        .order-meta { display: flex; justify-content: space-between; font-size: 11px; color: #9e908a; margin-bottom: 8px; }
+        .badge { padding: 2px 6px; border-radius: 3px; font-size: 11px; background: var(--milk-tea); color: var(--mocha); }
+        .badge.success { background: #e6ede9; color: #6b8e76; }
+        
+        .note-input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--soft-gray); box-sizing: border-box; font-size: 12px; margin-top: 8px; background: white; outline: none; color: var(--mocha); }
+        .submit-all-btn { background: var(--rose-cream); color: white; border: none; width: 100%; padding: 14px; border-radius: 6px; font-size: 14px; letter-spacing: 2px; cursor: pointer; margin-top: 16px; transition: 0.2s; }
+        .submit-all-btn:active { background: var(--rose-dark); }
 
-        /* 🎟️ 教學與樂樂合併整合區 */
-        .guide-box { background: white; border-radius: 16px; padding: 20px; border: 1px solid #f2ece9; box-shadow: 0 4px 12px rgba(0,0,0,0.02); line-height: 1.6; }
-        .lele-btn { display: block; text-align: center; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: bold; text-decoration: none; margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4); transition: 0.3s; }
-        .lele-btn:active { transform: scale(0.98); }
+        .summary-card { background: white; border: 1px solid var(--rose-cream); padding: 20px; border-radius: 8px; text-align: center; margin-top: 16px; }
+        .summary-price { font-size: 22px; font-weight: bold; color: var(--rose-dark); margin: 6px 0; }
 
-        /* 🧭 夢幻四分頁導覽列 */
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 68px; background: var(--card-bg); border-top: 1px solid #f2ece9; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -3px 12px rgba(142,120,115,0.06); z-index: 9999; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--gray); cursor: pointer; width: 25%; transition: 0.2s; position: relative; }
-        .nav-item.active { color: var(--primary-dark); font-weight: bold; transform: scale(1.05); }
-        .nav-icon { font-size: 18px; margin-bottom: 4px; }
-        .cart-badge { position: absolute; top: -2px; right: 20%; background: #ff6b6b; color: white; border-radius: 10px; padding: 1px 5px; font-size: 9px; font-weight: bold; min-width: 12px; text-align: center; }
-
-        #global-status { text-align: center; padding: 8px; font-size: 11px; color: var(--gray); }
+        /* 📖 教學極簡排版 */
+        .guide-box { background: white; border-radius: 8px; padding: 20px; border: 1px solid var(--milk-tea); font-size: 13px; color: var(--mocha); line-height: 1.7; letter-spacing: 0.5px; }
+        .lele-btn { display: block; text-align: center; background: var(--rose-cream); color: white; border: none; padding: 14px; border-radius: 6px; font-size: 13px; font-weight: bold; letter-spacing: 1px; text-decoration: none; margin-top: 20px; transition: 0.2s; }
+        
+        #global-status { text-align: center; padding: 10px; font-size: 11px; color: #9e908a; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
+    <div class="nav-bar">
+        <div class="nav-item active" id="nav-products" onclick="switchPage('products')">連線商品</div>
+        <div class="nav-item" id="nav-orders" onclick="switchPage('orders')">我的訂單</div>
+        <div class="nav-item" id="nav-checkout" onclick="switchPage('checkout')">
+            我的結單
+            <div class="cart-badge" id="cart-badge-count" style="display:none;">0</div>
+        </div>
+        <div class="nav-item" id="nav-guide" onclick="switchPage('guide')">結單教學</div>
+    </div>
+
     <div class="header">
-        <img id="userPicture" src="https://img.icons8.com/illustrations/xlarge/casual-life-3d-cat-lying-and-looking-ahead.png" alt="Avatar">
+        <img id="userPicture" src="https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop" alt="Avatar">
         <span id="userName">HuHuShop 呼來選品</span>
     </div>
 
     <div class="container">
-        <div id="global-status">正在同步連線線路...</div>
+        <div id="global-status">正在同步線上連線線路...</div>
 
         <div id="page-products" class="page active">
             <div id="products-list" class="products-grid"></div>
         </div>
 
         <div id="page-orders" class="page">
-            <h3 style="margin-top:0; font-size: 15px;">🎟️ 現場已配單明細</h3>
+            <h3 style="margin-top:0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">現場已配單明細</h3>
             <div id="orders-list">正在讀取配單紀錄...</div>
         </div>
 
         <div id="page-checkout" class="page">
-            <h3 style="margin-top:0; font-size: 15px;">🛍️ 購物車待送出項目</h3>
+            <h3 style="margin-top:0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">待確認連線項目</h3>
             <div id="cart-list"></div>
             
             <div class="summary-card">
-                <div style="font-size: 13px; font-weight: bold;">本次預計結單總金額</div>
+                <div style="font-size: 12px; letter-spacing: 1px;">預計結單總金額</div>
                 <div class="summary-price">NT$ <span id="checkout-total">0</span></div>
-                <input type="text" id="global-note" class="note-input" placeholder="有什麼想對呼呼說的嗎？（選填備註）">
-                <button class="submit-all-btn" id="submitAllBtn" onclick="submitFinalOrder()">確認無誤，送出訂單 🚀</button>
+                <input type="text" id="global-note" class="note-input" placeholder="新增備註（選填）">
+                <button class="submit-all-btn" id="submitAllBtn" onclick="submitFinalOrder()">確認無誤，送出訂單</button>
             </div>
         </div>
 
         <div id="page-guide" class="page">
-            <h3 style="margin-top:0; font-size: 15px;">📖 呼呼連線結單小教學</h3>
+            <h3 style="margin-top:0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">連線結單說明</h3>
             <div class="guide-box">
-                <p>親愛的團員您好！歡迎來到 <b>HuHuShop 呼來選品</b> 現場連線系統 🌸</p>
-                <p><b>💡 如何順利完成購買？</b><br>
-                1. 在【連線商品】頁面，選擇您要的規格與數量，點擊「加購物車」。<br>
-                2. 前往【我的結單】確認項目無誤，點擊「送出訂單」。<br>
-                3. 送出後，可至【我的訂單】追蹤呼呼在日本/韓國現場的採買與配單進度唷！</p>
+                <p>歡迎來到 <b>HuHuShop 呼來選品</b> 線上連線系統。</p>
+                <p><b>關於購買流程：</b><br>
+                1. 於「連線商品」選擇合適的規格與數量後加入購物車。<br>
+                2. 至「我的結單」確認品項並正式送出。<br>
+                3. 送出後，可於「我的訂單」頁面即時查詢小幫手在日韓現場的配單狀態。</p>
                 
-                <p style="border-top: 1px dashed #eee; padding-top: 15px; margin-top: 15px;">
-                    <b>✨ 樂樂系統合併通知：</b><br>
-                    為了方便大家統一對帳與出貨，請點擊下方按鈕跳轉至樂樂後台進行最終的匯款與填單登記。
+                <p style="border-top: 1px dashed var(--milk-tea); padding-top: 16px; margin-top: 16px;">
+                    <b>樂樂系統合併登記：</b><br>
+                    若您希望將本次連線的商品一併打包匯入樂樂後台進行結帳對帳，請點擊下方按鈕。系統將自動為您整理並傳送合併申請。
                 </p>
                 
-                <a href="https://蓋大樓或樂樂系統的登入網址.com" target="_blank" class="lele-btn">💖 前往樂樂系統合併結帳 🔗</a>
+                <button id="leleBtn" onclick="requestLeleMerge()" class="lele-btn">申請合併至樂樂系統</button>
             </div>
-        </div>
-    </div>
-
-    <div class="nav-bar">
-        <div class="nav-item active" id="nav-products" onclick="switchPage('products')">
-            <div class="nav-icon">✨</div>
-            <div>連線商品</div>
-        </div>
-        <div class="nav-item" id="nav-orders" onclick="switchPage('orders')">
-            <div class="nav-icon">🎟️</div>
-            <div>我的訂單</div>
-        </div>
-        <div class="nav-item" id="nav-checkout" onclick="switchPage('checkout')">
-            <div class="nav-icon">🛍️</div>
-            <div>我的結單</div>
-            <div class="cart-badge" id="cart-badge-count" style="display:none;">0</div>
-        </div>
-        <div class="nav-item" id="nav-guide" onclick="switchPage('guide')">
-            <div class="nav-icon">📖</div>
-            <div>結單教學</div>
         </div>
     </div>
 
 <script>
     const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
-    // ⚠️ 這裡填入你的專屬 GAS 部署網址（末尾為 /exec）
     const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbx3gGQGYNs0EtM8hqbRxeUPR8kkQXy823jDXr5S0QdYRTJgQg0ls4tCeO8-wTNFuXc/exec"; 
 
     let userLineId = "U_TEST_USER"; 
-    let userLineName = "試算表體驗團員";
+    let userLineName = "微醺奶油體驗團員";
     let myCart = []; 
+    let loadedOrdersCache = []; // 快取已配單的資料，用來給樂樂系統自動打包
+    let totalOrdersAmountCache = 0;
 
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -161,33 +234,34 @@
     async function initLiff() {
         const statusDiv = document.getElementById("global-status");
         try {
-            if (typeof liff === "undefined") { statusDiv.innerText = "🌸 模擬器環境載入成功"; loadProducts(); return; }
+            if (typeof liff === "undefined") { statusDiv.innerText = "精緻模擬環境載入"; loadProducts(); return; }
             await liff.init({ liffId: MY_LIFF_ID });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
                 userLineId = profile.userId;
                 userLineName = profile.displayName;
-                document.getElementById("userName").innerText = userLineName + " 🌸 呼來選品";
+                document.getElementById("userName").innerText = userLineName + " / 呼來選品";
                 if(profile.pictureUrl) document.getElementById("userPicture").src = profile.pictureUrl;
             }
-            statusDiv.innerText = "✨ 祝你今天採買搶單大好運！";
+            statusDiv.innerText = "今日連線採買順利";
             loadProducts();
+            silentLoadOrders(); // 後台靜默讀取已配單明細，做為樂樂合併儲備
         } catch (err) {
-            statusDiv.innerText = "✨ 歡迎來到呼來選品連線現場";
+            statusDiv.innerText = "歡迎來到呼來選品連線現場";
             loadProducts();
         }
     }
 
     async function loadProducts() {
         const container = document.getElementById("products-list");
-        container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px; color:var(--gray);'>現場連線同步中...</div>";
+        container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>連線線路同步中...</div>";
         try {
             const response = await fetch(`${MY_GAS_URL}?type=getProducts`);
             const products = await response.json();
             container.innerHTML = "";
             
             if(!products || products.length === 0) {
-                container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px; color:var(--gray);'>呼呼正在採買中，商品等等上架唷！</div>";
+                container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>目前現場尚未有新上架商品。</div>";
                 return;
             }
 
@@ -199,22 +273,22 @@
                 let specOptions = p.specs.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
 
                 card.innerHTML = `
-                    <img class="product-img" src="${p.img}" alt="商品圖" onerror="this.src='https://img.icons8.com/illustrations/xlarge/casual-life-3d-pink-gift-box-with-yellow-ribbon.png'">
+                    <img class="product-img" src="${p.img}" alt="商品" onerror="this.src='https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop'">
                     <div class="product-body">
                         <div class="product-title">${p.name}</div>
-                        <div class="product-price">NT$ ${p.price}</div>
+                        <div class="product-price">¥ ${p.price}</div>
                         <select id="prod-spec-${index}" class="select-spec" ${isOOS ? 'disabled' : ''}>${specOptions}</select>
                         <div class="qty-row">
                             <input type="number" id="prod-qty-${index}" class="qty-input" value="1" min="1" max="99" ${isOOS ? 'disabled' : ''}>
                             <button class="add-cart-btn" id="btn-${index}" onclick="addToCart('${p.name}', ${p.price}, ${index})" ${isOOS ? 'disabled' : ''}>
-                                ${isOOS ? '已結單' : '加購物車'}
+                                ${isOOS ? '已結單' : '加入選品'}
                             </button>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
-        } catch (err) { container.innerHTML = "<div style='grid-column: span 2; text-align:center;'>同步失敗，請確認後台部署網址是否正確。</div>"; }
+        } catch (err) { container.innerHTML = "<div style='grid-column: span 2; text-align:center; font-size:12px;'>同步線路失敗。</div>"; }
     }
 
     function addToCart(pName, price, index) {
@@ -222,22 +296,15 @@
         const qty = parseInt(document.getElementById(`prod-qty-${index}`).value) || 1;
         
         let existing = myCart.find(item => item.productName === pName && item.spec === spec);
-        if(existing) {
-            existing.qty += qty;
-        } else {
-            myCart.push({ productName: pName, price: price, spec: spec, qty: qty });
-        }
+        if(existing) { existing.qty += qty; } else { myCart.push({ productName: pName, price: price, spec: spec, qty: qty }); }
         updateCartBadge();
-        alert(`已將【${pName} (${spec}) x ${qty}】放入連線購物車🛍️！`);
+        alert(`已加入待確認連線清單。`);
     }
 
     function updateCartBadge() {
         const badge = document.getElementById("cart-badge-count");
         let totalQty = myCart.reduce((sum, item) => sum + item.qty, 0);
-        if(totalQty > 0) {
-            badge.innerText = totalQty;
-            badge.style.display = "block";
-        } else { badge.style.display = "none"; }
+        if(totalQty > 0) { badge.innerText = totalQty; badge.style.display = "block"; } else { badge.style.display = "none"; }
     }
 
     function renderCart() {
@@ -246,7 +313,7 @@
         list.innerHTML = "";
         
         if(myCart.length === 0) {
-            list.innerHTML = "<div style='text-align:center; color:var(--gray); padding:30px;'>購物車空空如也，快去挑選連線商品吧！</div>";
+            list.innerHTML = "<div style='text-align:center; color:var(--mocha); font-size:12px; padding:30px;'>目前無待確認項目。</div>";
             totalSpan.innerText = "0";
             return;
         }
@@ -257,15 +324,15 @@
             const div = document.createElement("div");
             div.className = "cart-item";
             div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:13px;">
                     <div>${item.productName}</div>
-                    <div style="color:var(--primary-dark);">$${item.price * item.qty}</div>
+                    <div style="color:var(--rose-dark);">$${item.price * item.qty}</div>
                 </div>
-                <div style="font-size:12px; color:var(--gray); margin-top:4px; display:flex; justify-content:space-between; align-items:center;">
-                    <span>規格: ${item.spec}</span>
+                <div style="font-size:12px; margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="opacity:0.7;">規格: ${item.spec}</span>
                     <div>
-                        數量: <input type="number" value="${item.qty}" min="1" style="width:40px; text-align:center;" onchange="updateCartQty(${idx}, this.value)">
-                        <button onclick="removeFromCart(${idx})" style="background:none; border:none; color:#ff6b6b; cursor:pointer; margin-left:10px;">刪除</button>
+                        數量: <input type="number" value="${item.qty}" min="1" style="width:35px; text-align:center; border:1px solid #ccc;" onchange="updateCartQty(${idx}, this.value)">
+                        <button onclick="removeFromCart(${idx})" style="background:none; border:none; color:var(--rose-dark); cursor:pointer; margin-left:10px; font-size:12px;">移除</button>
                     </div>
                 </div>
             `;
@@ -274,62 +341,103 @@
         totalSpan.innerText = total;
     }
 
-    function updateCartQty(idx, val) {
-        myCart[idx].qty = parseInt(val) || 1;
-        renderCart();
-        updateCartBadge();
-    }
-
-    function removeFromCart(idx) {
-        myCart.splice(idx, 1);
-        renderCart();
-        updateCartBadge();
-    }
+    function updateCartQty(idx, val) { myCart[idx].qty = parseInt(val) || 1; renderCart(); updateCartBadge(); }
+    function removeFromCart(idx) { myCart.splice(idx, 1); renderCart(); updateCartBadge(); }
 
     async function submitFinalOrder() {
-        if(myCart.length === 0) { alert("購物車沒有任何商品可以送出唷！"); return; }
+        if(myCart.length === 0) return;
         const btn = document.getElementById("submitAllBtn");
         const globalNote = document.getElementById("global-note").value.trim();
         
         btn.disabled = true;
-        btn.innerText = "正在打包傳送訂單中...";
+        btn.innerText = "正在傳送清單...";
 
-        let uploadItems = myCart.map(item => {
-            return { productName: item.productName, spec: item.spec, qty: item.qty, note: globalNote };
-        });
+        let uploadItems = myCart.map(item => { return { productName: item.productName, spec: item.spec, qty: item.qty, note: globalNote }; });
 
         try {
             const response = await fetch(MY_GAS_URL, {
                 method: "POST",
-                body: JSON.stringify({
-                    lineId: userLineId,
-                    lineName: userLineName,
-                    items: uploadItems
-                })
+                body: JSON.stringify({ lineId: userLineId, lineName: userLineName, items: uploadItems })
             });
             const result = await response.json();
             if(result.status === "success") {
-                alert("🎉 訂單全部成功送出！已經秒入試算表！");
+                alert("清單已同步傳送。");
                 myCart = []; 
                 updateCartBadge();
                 switchPage('orders'); 
-            } else { alert("送出失敗：" + result.message); }
-        } catch(err) { alert("連線失敗，請檢查網路環境。"); }
-        finally { btn.disabled = false; btn.innerText = "確認無誤，送出訂單 🚀"; }
+            }
+        } catch(err) { alert("網路傳送失敗"); }
+        finally { btn.disabled = false; btn.innerText = "確認無誤，送出訂單"; }
+    }
+
+    // ✨ 樂樂智慧自動打包與上傳邏輯
+    async function requestLeleMerge() {
+        const leleBtn = document.getElementById("leleBtn");
+        
+        // 檢查客人的歷史訂單內有沒有東西
+        if(loadedOrdersCache.length === 0) {
+            alert("目前查無您的已配單明細，無法進行合併。");
+            return;
+        }
+
+        leleBtn.disabled = true;
+        leleBtn.innerText = "正在打包明細並傳送要求...";
+
+        // 把好幾筆訂單壓縮打包成精簡的一行文字
+        let detailsString = loadedOrdersCache.map(o => `【${o.productName} / ${o.spec} x${o.qty}】`).join(" , ");
+
+        try {
+            const response = await fetch(MY_GAS_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({
+                    action: "submitLeleMerge",
+                    lineId: userLineId,
+                    lineName: userLineName,
+                    itemDetails: detailsString,
+                    totalAmount: totalOrdersAmountCache,
+                    note: "買家於網頁發起合併"
+                })
+            });
+            
+            // 🎯 核心需求：買家端僅顯示已傳送要求
+            alert("已傳送要求");
+            leleBtn.innerText = "已成功傳送合併要求";
+        } catch(err) {
+            alert("傳送失敗，請稍後再試。");
+            leleBtn.disabled = false;
+            leleBtn.innerText = "申請合併至樂樂系統";
+        }
+    }
+
+    // 靜默讀取，專門用來餵給樂樂打包
+    async function silentLoadOrders() {
+        try {
+            const response = await fetch(`${MY_GAS_URL}?type=getOrders&lineId=${userLineId}`);
+            const data = await response.json();
+            if (data.orders) {
+                loadedOrdersCache = data.orders;
+                totalOrdersAmountCache = data.total;
+            }
+        } catch (e) {}
     }
 
     async function loadUserOrders() {
         const orderContainer = document.getElementById("orders-list");
-        orderContainer.innerHTML = "<div style='text-align:center; padding:20px; color:var(--gray);'>正在拉取您在試算表的配單進度...</div>";
+        orderContainer.innerHTML = "<div style='text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>同步最新配單狀態...</div>";
         try {
             const response = await fetch(`${MY_GAS_URL}?type=getOrders&lineId=${userLineId}`);
             const data = await response.json();
             orderContainer.innerHTML = "";
             
             if (!data.orders || data.orders.length === 0) {
-                orderContainer.innerHTML = "<div style='text-align:center;color:var(--gray);padding:30px;'>目前查無您的現場配單紀錄唷！</div>";
+                orderContainer.innerHTML = "<div style='text-align:center; color:var(--mocha); font-size:12px; padding:30px;'>目前尚無現場配單紀錄。</div>";
                 return;
             }
+
+            // 更新快取
+            loadedOrdersCache = data.orders;
+            totalOrdersAmountCache = data.total;
 
             data.orders.forEach(o => {
                 const item = document.createElement("div");
@@ -337,17 +445,17 @@
                 const isSuccess = (o.status === "採買成功" || o.status === "已確認" || o.status === "已收到");
                 item.innerHTML = `
                     <div class="order-meta">
-                        <span>時間: ${o.time}</span>
+                        <span>${o.time}</span>
                         <span class="badge ${isSuccess ? 'success' : ''}">${o.status}</span>
                     </div>
-                    <div style="font-weight:bold; font-size:14px;">${o.productName}</div>
-                    <div style="font-size:12px; color:var(--gray); margin-top:3px;">規格: ${o.spec} | 數量: ${o.qty}</div>
-                    ${o.note ? `<div style="font-size:11px; background:#fdfbf7; padding:4px; margin-top:4px; color:#8a7e7d;">備註: ${o.note}</div>` : ''}
-                    <div style="text-align:right; font-weight:bold; color:var(--primary-dark); font-size:14px; margin-top:2px;">$${o.price}</div>
+                    <div style="font-weight:400; font-size:13px;">${o.productName}</div>
+                    <div style="font-size:11px; opacity:0.7; margin-top:4px;">規格: ${o.spec} / 數量: ${o.qty}</div>
+                    ${o.note ? `<div style="font-size:11px; background:#f4eae4; padding:6px; margin-top:6px;">備註: ${o.note}</div>` : ''}
+                    <div style="text-align:right; font-weight:bold; color:var(--rose-dark); font-size:13px; margin-top:2px;">$${o.price}</div>
                 `;
                 orderContainer.appendChild(item);
             });
-        } catch (err) { orderContainer.innerHTML = "讀取配單失敗。"; }
+        } catch (err) { orderContainer.innerHTML = "讀取失敗。"; }
     }
 
     window.addEventListener("load", initLiff);
