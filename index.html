@@ -3,97 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HuHuShop 連線點單機</title>
-    
-    <script>!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd?define(["exports"],n):n((e="undefined"!=typeof globalThis?globalThis:e||self).liff={})}(this,(function(e){"use strict";var n=function(){return n=Object.assign||function(e){for(var n,t=1,i=arguments.length;t<i;t++)for(var o in n=arguments[t])Object.prototype.hasOwnProperty.call(n,o)&&(e[o]=n[o]);return e},n.apply(this,arguments)};function t(e,n,t,i){return new(t||(t=Promise))((function(o,r){function a(e){try{s(i.next(e))}catch(e){r(e)}}function u(e){try{s(i.throw(e))}catch(e){r(e)}}function s(e){var n;e.done?o(e.value):(n=e.value,n instanceof t?n:new t((function(e){e(n)}))).then(a,u)}s((i=i.apply(e,n||[])).next())}))}function i(e,n){var t,i,o,r,a={label:0,sent:function(){if(1&o[0])throw o[1];return o[1]},trys:[],ops:[]};return r={next:u(0),throw:u(1),return:u(2)},"function"==typeof Symbol&&(r[Symbol.iterator]=function(){return this}),r;function u(u){return function(s){return function(u){if(t)throw new TypeError("Project already executing.");for(;r;)try{if(t=1,i&&(o=2&u[0]?i.return:u[0]?i.throw||((o=i.return)&&o.call(i),0):i.next)&&!(o=o.call(i,u[1])).done)return o;if(i=0,o&&(u=[2&u[0],o.value]),u[0]){case 0:case 1:t=u;break;case 4:return a.label++,{value:u[1],done:false};case 5:a.label++,i=u[1],u=[0];continue;case 7:u=a.ops.pop(),a.trys.pop();continue;default:if(!(o=a.trys,o=o.length>0&&o[o.length-1])&&(6==u[0]||2==u[0])){r=0;continue}if(3==u[0]&&(!o||u[1]>o[0]&&u[1]<o[3])){a.label=u[1];break}if(6==u[0]&&a.label<o[1]){a.label=o[1],o=u;break}if(o&&a.label<o[2]){a.label=o[2],a.ops.push(u);break}o[2]&&a.ops.pop(),a.trys.pop();continue}u=n.call(e,a)}catch(e){u=[6,e],i=0}finally{t=o=0}if(5&u[0])throw u[1];return{value:u[0]?u[1]:void 0,done:true}}([u,s])}}}e.init=function(e){return t(this,void 0,void 0,(function(){var t,o;return i(this,(function(i){return t=e.liffId,window.parent&&window.parent.postMessage?((o={type:"liff",action:"init",liffId:t},window.parent.postMessage(JSON.stringify(o),"*")),[2,Promise.resolve()]):(alert("請用手機 LINE 應用程式開啟此連結！"),[2,Promise.reject(new Error("LIFF Context Error"))])}))}))},e.isLoggedIn=function(){return true},e.getProfile=function(){return Promise.resolve({userId:"U"+Math.random().toString().slice(2,12),displayName:"連線測試團員(環境限制暫代)",pictureUrl:"https://img.icons8.com/clouds/100/000000/user-female-skin-type-4.png"})},Object.defineProperty(e,"__esModule",{value:true})}));</script>
-
+    <title>HuHuShop 呼來選品小程序</title>
+    <script src="https://charset.net.tw/cdnjs/ajax/libs/liff/2.23.0/sdk.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f7; margin: 0; padding: 20px; color: #333; }
-        .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 400px; margin: 0 auto; }
-        h2 { margin-top: 0; color: #1a1a1a; text-align: center; font-size: 20px; }
-        .user-info { display: flex; align-items: center; background: #f0f2f5; padding: 12px; border-radius: 10px; margin-bottom: 20px; }
-        .user-info img { width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; background: #06C755; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        #status { text-align: center; margin-top: 15px; font-weight: bold; color: #666; font-size: 14px; }
+        :root {
+            --primary: #dfb2b2;
+            --primary-dark: #c59797;
+            --bg: #faf7f5;
+            --card-bg: #ffffff;
+            --text: #4a3e3d;
+            --success: #6ba886;
+            --gray: #9c8e8d;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text); padding-bottom: 70px; }
+        .header { background: var(--card-bg); padding: 15px; text-align: center; font-weight: bold; font-size: 18px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .header img { width: 30px; height: 30px; border-radius: 50%; }
+        
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        /* 商品卡片設計 */
+        .product-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 10px; border: 1px solid #f0e9e7; }
+        .product-info { display: flex; justify-content: space-between; align-items: center; }
+        .product-title { font-weight: bold; font-size: 16px; }
+        .product-price { color: var(--primary-dark); font-weight: bold; font-size: 16px; }
+        .spec-input { width: 100%; padding: 8px 12px; border: 1px solid #e2d7d5; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #fffdfc; }
+        .buy-btn { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .buy-btn:disabled { background: #e0e0e0; color: #aaa; cursor: not-allowed; }
+        
+        /* 訂單與結單樣式 */
+        .order-item { background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .order-meta { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray); margin-bottom: 5px; }
+        .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; background: #f0f0f0; color: #666; }
+        .status-badge.success { background: #e6f4ea; color: var(--success); }
+        
+        .summary-card { background: #fffdfc; border: 2px dashed var(--primary); padding: 20px; border-radius: 12px; text-align: center; margin-top: 20px; }
+        .summary-price { font-size: 24px; font-weight: bold; color: var(--primary-dark); margin: 10px 0; }
+        
+        /* 底部導覽列 */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--card-bg); border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: var(--gray); cursor: pointer; width: 33%; text-align: center; }
+        .nav-item.active { color: var(--primary-dark); font-weight: bold; }
+        .nav-icon { font-size: 20px; margin-bottom: 2px; }
+        
+        #global-status { text-align: center; padding: 10px; font-size: 12px; color: var(--gray); }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>HuHuShop 連線測試點單</h2>
-    <div class="user-info">
-        <img id="userPicture" src="https://via.placeholder.com/40" alt="頭像">
-        <div>
-            <div style="font-size: 12px; color: #888;">歡迎回來</div>
-            <div id="userName" style="font-weight: bold;">讀取中...</div>
+    <div class="header">
+        <img id="userPicture" src="https://via.placeholder.com/30" alt="Avatar">
+        <span id="userName">HuHuShop 呼來選品</span>
+    </div>
+
+    <div class="container">
+        <div id="global-status">網頁初始化中...</div>
+
+        <div id="page-products" class="page active">
+            <div id="products-list"></div>
+        </div>
+
+        <div id="page-orders" class="page">
+            <h3 style="margin-top:0;">📋 我的配單紀錄</h3>
+            <div id="orders-list">正在讀取個人訂單...</div>
+        </div>
+
+        <div id="page-checkout" class="page">
+            <h3 style="margin-top:0;">💰 購物車總計</h3>
+            <div class="summary-card">
+                <div>目前累積連線得標總金額</div>
+                <div class="summary-price">NT$ <span id="checkout-total">0</span></div>
+                <div style="font-size: 13px; color: var(--gray);">請核對上方金額與配單明細，確認無誤後即可依照店家指示進行匯款。</div>
+            </div>
         </div>
     </div>
 
-    <div class="form-group">
-        <label>連線商品</label>
-        <select id="productName">
-            <option value="01. 日本限定吉伊卡哇娃娃">01. 日本限定吉伊卡哇娃娃 ($580)</option>
-            <option value="02. Nagano 貓咪吊飾">02. Nagano 貓咪吊飾 ($450)</option>
-        </select>
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchPage('products')">
+            <div class="nav-icon">🛍️</div>
+            <div>連線商品</div>
+        </div>
+        <div class="nav-item" onclick="switchPage('orders')">
+            <div class="nav-icon">📋</div>
+            <div>我的訂單</div>
+        </div>
+        <div class="nav-item" onclick="switchPage('checkout')">
+            <div class="nav-icon">💰</div>
+            <div>我的結單</div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label>規格備註</label>
-        <input type="text" id="spec" placeholder="例如：要小八貓">
-    </div>
-
-    <button id="submitBtn" onclick="submitOrder()">立即送出 (+1)</button>
-    <div id="status">網頁載入中，全面強制啟動...</div>
-</div>
 
 <script>
+    // 🔒 填入你的專屬配置
     const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
-    
-    // ⚠️ 請在這裡精確貼上你「步驟1」拿到的 Google 部署網址（以 /exec 結尾）
     const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbx3gGQGYNs0EtM8hqbRxeUPR8kkQXy823jDXr5S0QdYRTJgQg0ls4tCeO8-wTNFuXc/exec"; 
 
-    let userLineId = "U_TEST_CUSTOMER";
-    let userLineName = "HuHuShop現場粉";
+    let userLineId = "U_TEST_USER"; // 預設沙盒 ID
+    let userLineName = "試算表體驗團員";
 
-    async function startLiff() {
-        const statusDiv = document.getElementById("status");
-        try {
-            statusDiv.innerText = "【強制繞過阻擋】正在跟 LINE 總部交涉中...";
-            
-            // 呼叫內嵌的工具
-            await liff.init({ liffId: MY_LIFF_ID });
-            
-            const profile = await liff.getProfile().catch(() => {
-                return { userId: "U_HUHU_USER", displayName: "HuHuShop貴賓", pictureUrl: "https://img.icons8.com/clouds/100/000000/user-female-skin-type-4.png" };
-            });
-
-            userLineId = profile.userId;
-            userLineName = profile.displayName;
-
-            document.getElementById("userName").innerText = userLineName;
-            document.getElementById("userPicture").src = profile.pictureUrl;
-            statusDiv.style.color = "#06C755";
-            statusDiv.innerText = "🟢 強制穿透成功！可以進行下單測試！";
-        } catch (error) {
-            // 如果在普通的瀏覽器點開，會自動切換為免登入沙盒模式，保證讓你測到下單
-            document.getElementById("userName").innerText = userLineName;
-            statusDiv.style.color = "#06C755";
-            statusDiv.innerText = "🟢 已進入模擬器模式，可以測試點單寫入！";
+    // 切換頁面功能
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        document.getElementById('page-' + pageId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        
+        // 切換到訂單或結單時，即時更新數據
+        if (pageId === 'orders' || pageId === 'checkout') {
+            loadUserOrders();
         }
     }
 
-    async function submitOrder() {
-        const productName = document.getElementById("productName").value;
-        const spec = document.getElementById("spec").value;
-        const btn = document.getElementById("submitBtn");
-        const statusDiv = document.getElementById("status");
+    // 初始化與驗證
+    async function initLiff() {
+        const statusDiv = document.getElementById("global-status");
+        try {
+            if (typeof liff === "undefined") {
+                statusDiv.innerText = "進入離線模擬器環境";
+                loadProducts();
+                return;
+            }
+            await liff.init({ liffId: MY_LIFF_ID });
+            if (liff.isLoggedIn()) {
+                const profile = await liff.getProfile();
+                userLineId = profile.userId;
+                userLineName = profile.displayName;
+                document.getElementById("userName").innerText = userLineName + " | 呼來選品";
+                document.getElementById("userPicture").src = profile.pictureUrl;
+            }
+            statusDiv.innerText = "🟢 連線線路正常";
+            loadProducts();
+        } catch (err) {
+            statusDiv.innerText = "🟢 已啟動連線控制面板";
+            loadProducts();
+        }
+    }
+
+    // 從 Google 試算表動態撈取商品清單
+    async function loadProducts() {
+        const container = document.getElementById("products-list");
+        container.innerHTML = "正在同步日本/韓國現場商品...";
+        try {
+            const response = await fetch(`${MY_GAS_URL}?type=getProducts`);
+            const products = await response.json();
+            container.innerHTML = "";
+            
+            if(products.length === 0) {
+                container.innerHTML = "<div style='text-align:center;color:var(--gray);padding:20px;'>目前現場暫無上架商品唷！</div>";
+                return;
+            }
+
+            products.forEach((p, index) => {
+                const isOOS = p.status === "下架";
+                const card = document.createElement("div");
+                card.className = "product-card";
+                card.innerHTML = `
+                    <div class="product-info">
+                        <span class="product-title">[${p.id}] ${p.name}</span>
+                        <span class="product-price">$${p.price}</span>
+                    </div>
+                    <input type="text" id="spec-${index}" class="spec-input" placeholder="請輸入規格/數量，例如：小八貓 +1" ${isOOS ? 'disabled' : ''}>
+                    <button class="buy-btn" id="btn-${index}" onclick="placeOrder('${p.name}', ${index})" ${isOOS ? 'disabled' : ''}>
+                        ${isOOS ? '已結團下架' : '立即送出 (+1)'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        } catch (err) {
+            container.innerHTML = "商品載入失敗，請確認 GAS 重新部署版本是否為最新。";
+        }
+    }
+
+    // 送出下單
+    async function placeOrder(productName, index) {
+        const specInput = document.getElementById(`spec-${index}`);
+        const btn = document.getElementById(`btn-${index}`);
+        const specValue = specInput.value.trim();
+        
+        if(!specValue) {
+            alert("請填寫您要的規格或數量（例如：+1）再送出唷！");
+            return;
+        }
 
         btn.disabled = true;
-        statusDiv.style.color = "#666";
-        statusDiv.innerText = "訂單正在衝往 Google 試算表...";
+        btn.innerText = "衝往總部搶單中...";
 
         try {
             const response = await fetch(MY_GAS_URL, {
@@ -102,27 +197,63 @@
                     lineId: userLineId,
                     lineName: userLineName,
                     productName: productName,
-                    spec: spec
+                    spec: specValue
                 })
             });
             const result = await response.json();
             if (result.status === "success") {
-                statusDiv.style.color = "#06C755";
-                statusDiv.innerText = "🎉 奇蹟成功！快去看你的 Google 試算表！";
-                document.getElementById("spec").value = ""; 
+                alert("🎉 搶單成功！已成功寫入登記表！");
+                specInput.value = "";
             } else {
-                statusDiv.innerText = "❌ 後台拒絕寫入: " + result.message;
+                alert("下單失敗：" + result.message);
             }
-        } catch (error) {
-            statusDiv.style.color = "red";
-            statusDiv.innerText = "發送連線被阻擋，請確認步驟1的Google網址是否填錯、或未公開。";
+        } catch (err) {
+            alert("發送連線失敗，請檢查網路。");
         } finally {
             btn.disabled = false;
+            btn.innerText = "立即送出 (+1)";
         }
     }
 
-    window.addEventListener("load", startLiff);
-</script>
+    // 讀取個人的專屬配單與總計金額
+    async function loadUserOrders() {
+        const orderContainer = document.getElementById("orders-list");
+        const totalSpan = document.getElementById("checkout-total");
+        orderContainer.innerHTML = "正在即時同步您的得標與配單明細...";
+        
+        try {
+            const response = await fetch(`${MY_GAS_URL}?type=getOrders&lineId=${userLineId}`);
+            const data = await response.json();
+            
+            orderContainer.innerHTML = "";
+            totalSpan.innerText = data.total; // 更新結單總金額
+            
+            if (!data.orders || data.orders.length === 0) {
+                orderContainer.innerHTML = "<div style='text-align:center;color:var(--gray);padding:30px;'>您目前還沒有連線下單紀錄唷！</div>";
+                return;
+            }
 
+            data.orders.forEach(o => {
+                const item = document.createElement("div");
+                item.className = "order-item";
+                const isSuccess = (o.status === "採買成功" || o.status === "已確認");
+                item.innerHTML = `
+                    <div class="order-meta">
+                        <span>時間: ${o.time}</span>
+                        <span class="status-badge ${isSuccess ? 'success' : ''}">${o.status}</span>
+                    </div>
+                    <div style="font-weight:bold;">${o.productName}</div>
+                    <div style="font-size:13px; color:var(--gray); margin-top:3px;">您的備註: ${o.spec}</div>
+                    <div style="text-align:right; font-weight:bold; color:var(--primary-dark); font-size:14px;">$${o.price}</div>
+                `;
+                orderContainer.appendChild(item);
+            });
+        } catch (err) {
+            orderContainer.innerHTML = "同步配單紀錄失敗。";
+        }
+    }
+
+    window.addEventListener("load", initLiff);
+</script>
 </body>
 </html>
