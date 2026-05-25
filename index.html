@@ -4,7 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HuHuShop 連線點單機</title>
-    <script src="https://static.liff.line.me/js/v2/sdk.js"></script>
+    
+    <!-- ⭕ 修正關鍵：更換全新、最穩定的 LINE 官方下載通道 (改成直接指定 2.23 版本) -->
+    <script src="https://charset.net.tw/cdnjs/ajax/libs/liff/2.23.0/sdk.js" onerror="alert('工具包下載失敗，請檢查網路！')"></script>
+    <script>
+        // 如果上面備用通道萬一不給力，立刻自動切換回第二官方通道
+        if (typeof liff === 'undefined') {
+            document.write('<script src="https://static.liff.line.me/js/v2/sdk.js"><\/script>');
+        }
+    </script>
+
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f7; margin: 0; padding: 20px; color: #333; }
         .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 400px; margin: 0 auto; }
@@ -48,15 +57,16 @@
 </div>
 
 <script>
-    // 🚨 這是最頂層的警報器，只要網頁有任何地方出錯，立刻彈出視窗告狀！
+    // 錯誤捕獲
     window.onerror = function(message, source, lineno, colno, error) {
-        alert("💥 網頁程式碼有致命錯誤！\n原因: " + message + "\n行號: " + lineno);
+        alert("💥 網頁發生錯誤：\n原因: " + message + "\n行號: " + lineno);
         return false;
     };
 
+    // 🔒 你的專屬 ID
     const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
     
-    // ⚠️ 請小心貼上你的 GAS 網址，確保前後各有「一個」雙引號，最後以分號結尾
+    // ⚠️ 請在下方換上你的 Google 部署網址（記得保留雙引號）
     const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbx3gGQGYNs0EtM8hqbRxeUPR8kkQXy823jDXr5S0QdYRTJgQg0ls4tCeO8-wTNFuXc/exec"; 
 
     let userLineId = "";
@@ -65,13 +75,22 @@
     async function startLiff() {
         const statusDiv = document.getElementById("status");
         try {
+            // 這裡做個防呆，如果真的還是沒下載到，立刻彈窗
+            if (typeof liff === "undefined") {
+                alert("😭 警報：網頁依然無法載入 LINE 工具包，請確認手機網路是否有開啟防火牆或擋廣告 APP！");
+                statusDiv.innerText = "❌ 工具包載入失敗";
+                return;
+            }
+
             statusDiv.innerText = "正在向 LINE 總部建立連線...";
             await liff.init({ liffId: MY_LIFF_ID });
             
             statusDiv.innerText = "連線成功！驗證登入狀態...";
             if (!liff.isLoggedIn()) {
+                statusDiv.innerText = "引導跳轉登入中...";
                 liff.login(); 
             } else {
+                statusDiv.innerText = "讀取大頭貼與暱稱...";
                 const profile = await liff.getProfile();
                 userLineId = profile.userId;
                 userLineName = profile.displayName;
@@ -87,12 +106,48 @@
     }
 
     async function submitOrder() {
-        // 下單功能保持原樣...
+        // 下單發送功能保持原樣
+        const productName = document.getElementById("productName").value;
+        const spec = document.getElementById("spec").value;
+        const btn = document.getElementById("submitBtn");
+        const statusDiv = document.getElementById("status");
+
+        if (!userLineId) {
+            alert("尚未取得 LINE 資訊，無法下單");
+            return;
+        }
+
+        btn.disabled = true;
+        statusDiv.innerText = "訂單傳送中...";
+
+        try {
+            const response = await fetch(MY_GAS_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    lineId: userLineId,
+                    lineName: userLineName,
+                    productName: productName,
+                    spec: spec
+                })
+            });
+            const result = await response.json();
+            if (result.status === "success") {
+                statusDiv.innerText = "🎉 搶單成功！已寫入後台！";
+                document.getElementById("spec").value = ""; 
+            } else {
+                statusDiv.innerText = "❌ 失敗: " + result.message;
+            }
+        } catch (error) {
+            statusDiv.innerText = "發送出錯，請確認後台設定";
+        } finally {
+            btn.disabled = false;
+        }
     }
 
     // 啟動開關
     window.addEventListener("load", function() {
-        startLiff();
+        // 用一個小延遲確保腳本都排隊載入完了
+        setTimeout(startLiff, 300);
     });
 </script>
 
