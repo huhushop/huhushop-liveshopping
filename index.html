@@ -75,11 +75,10 @@
         .cart-item, .order-item { background: white; padding: 12px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--milk-tea); }
         .order-meta { display: flex; justify-content: space-between; font-size: 11px; color: #9e908a; margin-bottom: 6px; align-items: center; }
         
-        /* 🎨 優雅日系狀態標籤 */
         .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; letter-spacing: 0.5px; }
-        .badge.not-yet { background: #f2ece9; color: #9e908a; } /* 未購買：中性細緻灰 */
-        .badge.success { background: #e6ede9; color: #6b8e76; } /* 已購買：復古文青綠 */
-        .badge.oos { background: #f9ebea; color: #c0392b; }     /* 斷貨：低飽和淡紅 */
+        .badge.not-yet { background: #f2ece9; color: #9e908a; } 
+        .badge.success { background: #e6ede9; color: #6b8e76; } 
+        .badge.oos { background: #f9ebea; color: #c0392b; }     
         
         .note-input { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--soft-gray); box-sizing: border-box; font-size: 12px; margin-top: 8px; background: white; outline: none; }
         .submit-all-btn { background: var(--rose-cream); color: white; border: none; width: 100%; padding: 12px; border-radius: 4px; font-size: 13px; letter-spacing: 2px; cursor: pointer; margin-top: 12px; }
@@ -87,8 +86,11 @@
         .summary-card { background: white; border: 1px solid var(--rose-cream); padding: 16px; border-radius: 6px; text-align: center; margin-top: 12px; }
         .summary-price { font-size: 20px; font-weight: bold; color: var(--rose-dark); margin: 4px 0; }
 
-        .guide-box { background: white; border-radius: 6px; padding: 16px; border: 1px solid var(--milk-tea); font-size: 12px; line-height: 1.7; }
-        .lele-btn { display: block; text-align: center; background: var(--rose-cream); color: white; border: none; padding: 12px; border-radius: 4px; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 16px; width: 100%; cursor: pointer; }
+        /* 📋 教學內頁極簡美學排版 */
+        .guide-box { background: white; border-radius: 6px; padding: 18px; border: 1px solid var(--milk-tea); font-size: 13px; color: var(--mocha); line-height: 1.8; letter-spacing: 0.5px; }
+        .guide-box h4 { margin: 16px 0 6px 0; color: var(--rose-dark); font-weight: 500; font-size: 13px; letter-spacing: 1px; }
+        .guide-box p { margin: 0 0 12px 0; }
+        .lele-btn { display: block; text-align: center; background: var(--rose-cream); color: white; border: none; padding: 12px; border-radius: 4px; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 16px; width: 100%; cursor: pointer; letter-spacing: 1px; }
         .lele-btn:disabled { background: #e0e0e0; color: #aaa; cursor: not-allowed; }
         
         #global-status { text-align: center; padding: 6px; font-size: 11px; color: #9e908a; }
@@ -145,18 +147,14 @@
         </div>
 
         <div id="page-guide" class="page">
-            <h3 style="margin-top:0; font-size: 13px; font-weight: 400;">連線結單說明</h3>
+            <h3 style="margin-top:0; font-size: 13px; font-weight: 400;">現場連線結單說明</h3>
             <div class="guide-box">
-                <p>歡迎來到 <b>HuHuShop 呼來選品</b> 線上連線系統。</p>
-                <p><b>關於購買流程：</b><br>
-                1. 於「連線商品」選擇合適的規格與數量後點擊「加單」。<br>
-                2. 至「我的結單」確認品項並正式送出。<br>
-                3. 送出後，可於「我的訂單」頁面即時查詢小幫手在日韓現場的配單狀態。</p>
+                <h4>1. 現場連線直接結單</h4>
+                <p>若您希望直接單獨結清本次日韓連線採買的商品，請於「我的訂單」確認採買狀態後，直接私訊 LINE 官方帳號 <b>@514pfcah</b> 索取 7-11 賣貨便下單連結，並依照網頁顯示之結單總金額進行下單，下單時請務必於備註欄填入您的綽號以利小幫手對帳。</p>
                 
-                <p style="border-top: 1px dashed var(--milk-tea); padding-top: 14px; margin-top: 14px;">
-                    <b>樂樂系統合併登記：</b><br>
-                    若您希望將本次連線的商品一併打包匯入樂樂後台進行結帳對帳，請點擊下方按鈕。系統將自動為您整理並傳送合併申請。
-                </p>
+                <h4>2. 轉入樂樂系統合併結單</h4>
+                <p>若您希望將本次連線成功的商品，與您先前在樂樂後台已有的常態商品一併合併對帳、打包寄出，請直接點擊下方按鈕申請轉入。轉入成功後，此處的明細將由小幫手統一匯入樂樂後台與其他商品一同結單。</p>
+                
                 <button id="leleBtn" onclick="requestLeleMerge()" class="lele-btn">申請合併至樂樂系統</button>
             </div>
         </div>
@@ -168,7 +166,6 @@
 
     const CLOSING_TIME = new Date("2026-06-15T23:59:59+08:00"); 
 
-    // 💡 已經直接換成你提供的專屬實測 LINE ID
     let userLineId = "Ubd06fad9646f3ac3d06b6565703bd30e"; 
     let userLineName = "HuHu / 連線測試員";
     
@@ -371,8 +368,6 @@
 
     async function requestLeleMerge() {
         const leleBtn = document.getElementById("leleBtn");
-        
-        // 💡 盲點防呆：只篩選出「已購買」或「已收到」的商品，過濾掉未購買或斷貨
         let confirmedOrders = loadedOrdersCache.filter(o => o.status === "已購買" || o.status === "已收到");
         
         if(confirmedOrders.length === 0) { 
@@ -431,7 +426,6 @@
                 const item = document.createElement("div");
                 item.className = "order-item";
                 
-                // 💡 文青配色狀態標籤分配
                 let statusClass = "not-yet";
                 if(o.status === "已購買" || o.status === "已收到") statusClass = "success";
                 if(o.status === "斷貨" || o.status === "沒買到") statusClass = "oos";
