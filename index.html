@@ -20,7 +20,7 @@
         
         /* 🎀 頂部橫條 */
         .header { background: var(--card-bg); padding: 15px; text-align: center; font-weight: bold; font-size: 16px; border-bottom: 2px dashed var(--primary); display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .header img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--primary); }
+        .header img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
         
         .container { padding: 12px; max-width: 600px; margin: 0 auto; }
         .page { display: none; }
@@ -42,7 +42,7 @@
         .add-cart-btn:disabled { background: #e0e0e0; box-shadow: none; color: #aaa; }
 
         /* 📋 訂單與購物車樣式 */
-        .cart-item, .order-item { background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #f2ece9; box-shadow: 0 2px 6px rgba(0,0,0,0.01); }
+        .cart-item, .order-item { background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #f2ece9; }
         .order-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray); margin-bottom: 6px; }
         .badge { padding: 2px 6px; border-radius: 6px; font-size: 11px; font-weight: bold; background: #eee; }
         .badge.success { background: #e8f5e9; color: #5cb85c; }
@@ -53,12 +53,17 @@
         .summary-card { background: #fffdfd; border: 2px dashed var(--primary); padding: 20px; border-radius: 16px; text-align: center; margin-top: 15px; }
         .summary-price { font-size: 26px; font-weight: 900; color: var(--primary-dark); margin: 8px 0; }
 
-        /* 🧭 修正後的精緻導覽列（確保結單絕不消失） */
+        /* 🎟️ 教學與樂樂合併整合區 */
+        .guide-box { background: white; border-radius: 16px; padding: 20px; border: 1px solid #f2ece9; box-shadow: 0 4px 12px rgba(0,0,0,0.02); line-height: 1.6; }
+        .lele-btn { display: block; text-align: center; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: bold; text-decoration: none; margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4); transition: 0.3s; }
+        .lele-btn:active { transform: scale(0.98); }
+
+        /* 🧭 夢幻四分頁導覽列 */
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 68px; background: var(--card-bg); border-top: 1px solid #f2ece9; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -3px 12px rgba(142,120,115,0.06); z-index: 9999; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--gray); cursor: pointer; width: 33%; transition: 0.2s; position: relative; text-decoration: none; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--gray); cursor: pointer; width: 25%; transition: 0.2s; position: relative; }
         .nav-item.active { color: var(--primary-dark); font-weight: bold; transform: scale(1.05); }
-        .nav-icon { font-size: 20px; margin-bottom: 3px; }
-        .cart-badge { position: absolute; top: -2px; right: 25%; background: #ff6b6b; color: white; border-radius: 10px; padding: 1px 6px; font-size: 10px; font-weight: bold; min-width: 12px; text-align: center; }
+        .nav-icon { font-size: 18px; margin-bottom: 4px; }
+        .cart-badge { position: absolute; top: -2px; right: 20%; background: #ff6b6b; color: white; border-radius: 10px; padding: 1px 5px; font-size: 9px; font-weight: bold; min-width: 12px; text-align: center; }
 
         #global-status { text-align: center; padding: 8px; font-size: 11px; color: var(--gray); }
     </style>
@@ -66,25 +71,22 @@
 <body>
 
     <div class="header">
-        <img id="userPicture" src="https://img.icons8.com/illustrations/xlarge/casual-life-3d-pink-gift-box-with-yellow-ribbon.png" alt="Avatar">
+        <img id="userPicture" src="https://img.icons8.com/illustrations/xlarge/casual-life-3d-cat-lying-and-looking-ahead.png" alt="Avatar">
         <span id="userName">HuHuShop 呼來選品</span>
     </div>
 
     <div class="container">
         <div id="global-status">正在同步連線線路...</div>
 
-        <!-- 🎀 頁面 1：連線商品 -->
         <div id="page-products" class="page active">
             <div id="products-list" class="products-grid"></div>
         </div>
 
-        <!-- 🎀 頁面 2：我的訂單 -->
         <div id="page-orders" class="page">
             <h3 style="margin-top:0; font-size: 15px;">🎟️ 現場已配單明細</h3>
             <div id="orders-list">正在讀取配單紀錄...</div>
         </div>
 
-        <!-- 🎀 頁面 3：我的結單 -->
         <div id="page-checkout" class="page">
             <h3 style="margin-top:0; font-size: 15px;">🛍️ 購物車待送出項目</h3>
             <div id="cart-list"></div>
@@ -96,9 +98,26 @@
                 <button class="submit-all-btn" id="submitAllBtn" onclick="submitFinalOrder()">確認無誤，送出訂單 🚀</button>
             </div>
         </div>
+
+        <div id="page-guide" class="page">
+            <h3 style="margin-top:0; font-size: 15px;">📖 呼呼連線結單小教學</h3>
+            <div class="guide-box">
+                <p>親愛的團員您好！歡迎來到 <b>HuHuShop 呼來選品</b> 現場連線系統 🌸</p>
+                <p><b>💡 如何順利完成購買？</b><br>
+                1. 在【連線商品】頁面，選擇您要的規格與數量，點擊「加購物車」。<br>
+                2. 前往【我的結單】確認項目無誤，點擊「送出訂單」。<br>
+                3. 送出後，可至【我的訂單】追蹤呼呼在日本/韓國現場的採買與配單進度唷！</p>
+                
+                <p style="border-top: 1px dashed #eee; padding-top: 15px; margin-top: 15px;">
+                    <b>✨ 樂樂系統合併通知：</b><br>
+                    為了方便大家統一對帳與出貨，請點擊下方按鈕跳轉至樂樂後台進行最終的匯款與填單登記。
+                </p>
+                
+                <a href="https://蓋大樓或樂樂系統的登入網址.com" target="_blank" class="lele-btn">💖 前往樂樂系統合併結帳 🔗</a>
+            </div>
+        </div>
     </div>
 
-    <!-- 🧭 換上日韓系清新小圖示的導覽列 -->
     <div class="nav-bar">
         <div class="nav-item active" id="nav-products" onclick="switchPage('products')">
             <div class="nav-icon">✨</div>
@@ -113,10 +132,15 @@
             <div>我的結單</div>
             <div class="cart-badge" id="cart-badge-count" style="display:none;">0</div>
         </div>
+        <div class="nav-item" id="nav-guide" onclick="switchPage('guide')">
+            <div class="nav-icon">📖</div>
+            <div>結單教學</div>
+        </div>
     </div>
 
 <script>
     const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
+    // ⚠️ 這裡填入你的專屬 GAS 部署網址（末尾為 /exec）
     const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbx3gGQGYNs0EtM8hqbRxeUPR8kkQXy823jDXr5S0QdYRTJgQg0ls4tCeO8-wTNFuXc/exec"; 
 
     let userLineId = "U_TEST_USER"; 
@@ -124,11 +148,9 @@
     let myCart = []; 
 
     function switchPage(pageId) {
-        // 切換頁面顯示
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('page-' + pageId).classList.add('active');
         
-        // 切換導覽列高亮
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById('nav-' + pageId).classList.add('active');
         
@@ -139,7 +161,7 @@
     async function initLiff() {
         const statusDiv = document.getElementById("global-status");
         try {
-            if (typeof liff === "undefined") { statusDiv.innerText = "🌸 模擬器連線中"; loadProducts(); return; }
+            if (typeof liff === "undefined") { statusDiv.innerText = "🌸 模擬器環境載入成功"; loadProducts(); return; }
             await liff.init({ liffId: MY_LIFF_ID });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
@@ -164,7 +186,7 @@
             const products = await response.json();
             container.innerHTML = "";
             
-            if(products.length === 0) {
+            if(!products || products.length === 0) {
                 container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px; color:var(--gray);'>呼呼正在採買中，商品等等上架唷！</div>";
                 return;
             }
@@ -177,7 +199,7 @@
                 let specOptions = p.specs.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
 
                 card.innerHTML = `
-                    <img class="product-img" src="${p.img}" alt="商品圖">
+                    <img class="product-img" src="${p.img}" alt="商品圖" onerror="this.src='https://img.icons8.com/illustrations/xlarge/casual-life-3d-pink-gift-box-with-yellow-ribbon.png'">
                     <div class="product-body">
                         <div class="product-title">${p.name}</div>
                         <div class="product-price">NT$ ${p.price}</div>
@@ -192,7 +214,7 @@
                 `;
                 container.appendChild(card);
             });
-        } catch (err) { container.innerHTML = "同步失敗，請確認後台部署。"; }
+        } catch (err) { container.innerHTML = "<div style='grid-column: span 2; text-align:center;'>同步失敗，請確認後台部署網址是否正確。</div>"; }
     }
 
     function addToCart(pName, price, index) {
@@ -205,7 +227,6 @@
         } else {
             myCart.push({ productName: pName, price: price, spec: spec, qty: qty });
         }
-        
         updateCartBadge();
         alert(`已將【${pName} (${spec}) x ${qty}】放入連線購物車🛍️！`);
     }
@@ -216,9 +237,7 @@
         if(totalQty > 0) {
             badge.innerText = totalQty;
             badge.style.display = "block";
-        } else {
-            badge.style.display = "none";
-        }
+        } else { badge.style.display = "none"; }
     }
 
     function renderCart() {
@@ -269,7 +288,6 @@
 
     async function submitFinalOrder() {
         if(myCart.length === 0) { alert("購物車沒有任何商品可以送出唷！"); return; }
-        
         const btn = document.getElementById("submitAllBtn");
         const globalNote = document.getElementById("global-note").value.trim();
         
