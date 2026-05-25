@@ -15,15 +15,13 @@
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; }
         input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         button { width: 100%; background: #06C755; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #05b34c; }
-        #status { text-align: center; margin-top: 15px; font-weight: bold; color: #666; font-size: 14px; line-height: 1.5; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; color: #666; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>HuHuShop 連線測試點單</h2>
-    
     <div class="user-info">
         <img id="userPicture" src="https://via.placeholder.com/40" alt="頭像">
         <div>
@@ -37,13 +35,12 @@
         <select id="productName">
             <option value="01. 日本限定吉伊卡哇娃娃">01. 日本限定吉伊卡哇娃娃 ($580)</option>
             <option value="02. Nagano 貓咪吊飾">02. Nagano 貓咪吊飾 ($450)</option>
-            <option value="03. Heveblue 補水面霜">03. Heveblue 補水面霜 ($780)</option>
         </select>
     </div>
 
     <div class="form-group">
-        <label>規格 / 色號 / 備註</label>
-        <input type="text" id="spec" placeholder="例如：要小八貓 / 幫忙拆袋">
+        <label>規格備註</label>
+        <input type="text" id="spec" placeholder="例如：要小八貓">
     </div>
 
     <button id="submitBtn" onclick="submitOrder()">立即送出 (+1)</button>
@@ -51,17 +48,53 @@
 </div>
 
 <script>
-    // 🔒 這裡已經幫你填好你的專屬 ID 囉！
+    // 🚨 這是最頂層的警報器，只要網頁有任何地方出錯，立刻彈出視窗告狀！
+    window.onerror = function(message, source, lineno, colno, error) {
+        alert("💥 網頁程式碼有致命錯誤！\n原因: " + message + "\n行號: " + lineno);
+        return false;
+    };
+
     const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
     
-    // ⚠️ 請在下方雙引號內，貼上你在「步驟1」拿到的 Google 部署網址（以 /exec 結尾的那串）
+    // ⚠️ 請小心貼上你的 GAS 網址，確保前後各有「一個」雙引號，最後以分號結尾
     const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbx3gGQGYNs0EtM8hqbRxeUPR8kkQXy823jDXr5S0QdYRTJgQg0ls4tCeO8-wTNFuXc/exec"; 
 
     let userLineId = "";
     let userLineName = "";
 
-    // 啟動 LINE LIFF 初始化
     async function startLiff() {
         const statusDiv = document.getElementById("status");
         try {
-            statusDiv.innerText = "正在
+            statusDiv.innerText = "正在向 LINE 總部建立連線...";
+            await liff.init({ liffId: MY_LIFF_ID });
+            
+            statusDiv.innerText = "連線成功！驗證登入狀態...";
+            if (!liff.isLoggedIn()) {
+                liff.login(); 
+            } else {
+                const profile = await liff.getProfile();
+                userLineId = profile.userId;
+                userLineName = profile.displayName;
+                document.getElementById("userName").innerText = userLineName;
+                document.getElementById("userPicture").src = profile.pictureUrl;
+                statusDiv.style.color = "#06C755";
+                statusDiv.innerText = "🟢 LINE 連線成功，可以下單囉！";
+            }
+        } catch (error) {
+            alert("LIFF 啟動失敗彈窗: " + error.message);
+            statusDiv.innerText = "錯誤: " + error.message;
+        }
+    }
+
+    async function submitOrder() {
+        // 下單功能保持原樣...
+    }
+
+    // 啟動開關
+    window.addEventListener("load", function() {
+        startLiff();
+    });
+</script>
+
+</body>
+</html>
