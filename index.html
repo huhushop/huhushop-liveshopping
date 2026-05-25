@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HuHuShop 連線點單機</title>
-    <!-- 引入 LINE LIFF 的 SDK 開發工具 -->
-    <script src="[https://static.liff.line.me/js/v2/sdk.js](https://static.liff.line.me/js/v2/sdk.js)"></script>
+    <script src="https://static.liff.line.me/js/v2/sdk.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f7; margin: 0; padding: 20px; color: #333; }
         .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 400px; margin: 0 auto; }
@@ -17,7 +16,7 @@
         input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         button { width: 100%; background: #06C755; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         button:hover { background: #05b34c; }
-        #status { text-align: center; margin-top: 15px; font-weight: bold; color: #666; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; color: #666; font-size: 14px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -25,7 +24,6 @@
 <div class="card">
     <h2>HuHuShop 連線測試點單</h2>
     
-    <!-- LINE 使用者資訊顯示區 -->
     <div class="user-info">
         <img id="userPicture" src="https://via.placeholder.com/40" alt="頭像">
         <div>
@@ -34,7 +32,6 @@
         </div>
     </div>
 
-    <!-- 下單表單 -->
     <div class="form-group">
         <label>連線商品</label>
         <select id="productName">
@@ -50,104 +47,21 @@
     </div>
 
     <button id="submitBtn" onclick="submitOrder()">立即送出 (+1)</button>
-    <div id="status">LINE 登入初始化中...</div>
+    <div id="status">網頁載入中，準備連線...</div>
 </div>
 
 <script>
-    // ⚠️【請在這裡填入你的設定】⚠️
+    // 🔒 這裡已經幫你填好你的專屬 ID 囉！
     const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
-    const MY_GAS_URL = "https://liff.line.me/2010190278-1t2XrDnx"; 
+    
+    // ⚠️ 請在下方雙引號內，貼上你在「步驟1」拿到的 Google 部署網址（以 /exec 結尾的那串）
+    const MY_GAS_URL = "這裡請換成你的Google部署網址"; 
 
     let userLineId = "";
     let userLineName = "";
 
-  // 初始化 LINE LIFF（加強抓錯版）
-    async function initLiff() {
+    // 啟動 LINE LIFF 初始化
+    async function startLiff() {
         const statusDiv = document.getElementById("status");
         try {
-            statusDiv.innerText = "正在嘗試連線 LINE 總部...";
-            await liff.init({ liffId: MY_LIFF_ID });
-            
-            statusDiv.innerText = "連線成功，正在驗證登入狀態...";
-            if (!liff.isLoggedIn()) {
-                statusDiv.innerText = "偵測到未登入，正在跳轉 LINE 登入畫面...";
-                liff.login(); 
-            } else {
-                statusDiv.innerText = "登入成功，正在讀取您的個人資料...";
-                const profile = await liff.getProfile();
-                userLineId = profile.userId;
-                userLineName = profile.displayName;
-                
-                document.getElementById("userName").innerText = userLineName;
-                document.getElementById("userPicture").src = profile.pictureUrl;
-                statusDiv.innerText = "🟢 LINE 連線成功，可以下單囉！";
-            }
-        } catch (error) {
-            // 💥 這裡最重要！如果失敗，直接把 LINE 給的吐血原因寫在手機螢幕上
-            document.getElementById("userName").innerText = "❌ 讀取失敗";
-            statusDiv.innerHTML = "<span style='color:red;'>LIFF 錯誤原因: " + error.message + "<br>詳細資訊: " + JSON.stringify(error) + "</span>";
-        }
-    }
-    // 點擊下單按鈕的動作
-    async function submitOrder() {
-        const productName = document.getElementById("productName").value;
-        const spec = document.getElementById("spec").value;
-        const btn = document.getElementById("submitBtn");
-        const statusDiv = document.getElementById("status");
-
-        if (!userLineId) {
-            alert("尚未取得 LINE 資訊，請重新整理網頁");
-            return;
-        }
-
-        btn.disabled = true;
-        statusDiv.innerText = "訂單傳送中...";
-
-        // 把資料包裝成 JSON 格式
-        const orderData = {
-            lineId: userLineId,
-            lineName: userLineName,
-            productName: productName,
-            spec: spec
-        };
-
-        try {
-            // 用 API 把資料打回你的 Google 試算表 (GAS)
-            const response = await fetch(MY_GAS_URL, {
-                method: "POST",
-                body: JSON.stringify(orderData)
-            });
-            const result = await response.json();
-            
-            if (result.status === "success") {
-                statusDiv.innerText = "🎉 搶單成功！已寫入後台！";
-                document.getElementById("spec").value = ""; // 清空備註欄
-            } else {
-                statusDiv.innerText = "❌ 失敗: " + result.message;
-            }
-        } catch (error) {
-            statusDiv.innerText = "發送出錯，請確認後台部署是否正確";
-        } finally {
-            btn.disabled = false;
-        }
-    }
-
-    // 網頁開啟時自動執行
-   // ⭕ 新的寫法：設定保險機制，確保 LINE 工具包完全載入後才執行
-function checkLiffAndInit() {
-    if (typeof liff !== 'undefined') {
-        statusDiv = document.getElementById("status"); // 確保抓得到欄位
-        initLiff();
-    } else {
-        // 如果還沒下載完，每隔 0.1 秒重新檢查一次
-        setTimeout(checkLiffAndInit, 100);
-    }
-}
-
-window.onload = function() {
-    checkLiffAndInit();
-};
-</script>
-
-</body>
-</html>
+            statusDiv.innerText = "正在
