@@ -1,41 +1,19 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <title>HuHuShop 呼來選品</title>
-</head>
-<body>
-    <div id="products-list" class="products-grid">載入中...</div>
+<script>
+    const API_URL = "你的_Web_App_URL"; // 務必填寫
 
-    <script>
-        const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbyEyZ1OioaGpS4BkhjDlCNpeghPvoXiODQKIalxQogQRof0OuECABkQm4B2vVfRL8VK/exec"; 
-
-        // 1. 確保函數先存在
-        function renderProductsHTML(list) {
-            const container = document.getElementById("products-list");
-            if (!container) { console.error("找不到 products-list DIV"); return; }
-            container.innerHTML = "";
-            list.forEach(p => {
-                container.innerHTML += `<div>${p.name} - $${p.price}</div>`;
-            });
-        }
-
-        // 2. 資料載入
-        async function loadProductsFromServer() {
-            try {
-                const response = await fetch(MY_GAS_URL);
-                const data = await response.json();
-                const productsCache = data.map(item => ({
-                    name: item['名稱'],
-                    price: item['價格']
-                }));
-                renderProductsHTML(productsCache);
-            } catch (err) {
-                console.error("載入失敗:", err);
-            }
-        }
-
-        window.addEventListener("load", loadProductsFromServer);
-    </script>
-</body>
-</html>
+    async function loadProducts() {
+        const res = await fetch(API_URL);
+        const products = await res.json();
+        const container = document.getElementById("products-list");
+        container.innerHTML = products.map((p, i) => `
+            <div class="product-card">
+                <img src="${p.img}" class="product-img">
+                <div class="product-body">
+                    <div class="product-title">${p.name}</div>
+                    <div class="product-price">$${p.price}</div>
+                    <button onclick="addToCart('${p.name}', ${p.price})">加單</button>
+                </div>
+            </div>
+        `).join('');
+    }
+</script>
