@@ -6,408 +6,43 @@
     <title>HuHuShop 呼來選品</title>
     <script src="https://charset.net.tw/cdnjs/ajax/libs/liff/2.23.0/sdk.js"></script>
     <style>
-        :root {
-            --milk-tea: #f4eae4;      
-            --butter: #fbf7f4;        
-            --mocha: #6d5f5a;         
-            --rose-cream: #e6c5bf;    
-            --rose-dark: #cc9f97;     
-            --soft-gray: #d9cfca;     
-        }
-        
-        body { 
-            font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif; 
-            background-color: var(--butter); 
-            margin: 0; 
-            padding: 0; 
-            color: var(--mocha); 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        
-        /* 🧭 上置型文青導覽列 */
-        .nav-bar { 
-            background: var(--butter); border-bottom: 1px solid var(--milk-tea); display: flex; justify-content: space-around; align-items: center; position: sticky; top: 0; z-index: 9999;
-        }
-        .nav-item { 
-            padding: 14px 0; font-size: 13px; color: var(--mocha); opacity: 0.6; cursor: pointer; width: 25%; text-align: center; letter-spacing: 1px; position: relative; transition: 0.2s;
-        }
-        .nav-item.active { opacity: 1; font-weight: bold; }
-        .nav-item.active::after {
-            content: ''; position: absolute; bottom: 0; left: 30%; right: 30%; height: 2px; background-color: var(--rose-dark);
-        }
-        .cart-badge { 
-            position: absolute; top: 8px; right: 12%; background: var(--rose-dark); color: white; border-radius: 8px; padding: 1px 5px; font-size: 9px; font-weight: bold; 
-        }
-
-        .timer-banner {
-            background-color: #f2ece9; color: var(--mocha); text-align: center; padding: 6px; font-size: 11px; letter-spacing: 1px; border-bottom: 1px solid var(--milk-tea);
-        }
-
-        .header { 
-            background: var(--butter); padding: 14px; text-align: center; font-size: 14px; letter-spacing: 2px; font-weight: 300; border-bottom: 1px solid var(--milk-tea); display: flex; align-items: center; justify-content: center; gap: 10px; 
-        }
-        .header img { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--rose-cream); object-fit: cover; }
-        
-        /* 🏷️ 分類橫條：新增「所有商品」並支援滑動 */
-        .category-wrapper {
-            overflow-x: auto;
-            white-space: nowrap;
-            padding: 12px 10px 6px 10px;
-            -webkit-overflow-scrolling: touch;
-        }
-        .category-container { display: inline-flex; gap: 10px; min-width: 100%; justify-content: center; }
-        .cat-tab { font-size: 11px; padding: 5px 12px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; opacity: 0.5; transition: 0.2s; background: rgba(255,255,255,0.5); }
-        .cat-tab.active { opacity: 1; background-color: white; border-color: var(--rose-cream); color: var(--rose-dark); font-weight: bold; }
-
-        .container { padding: 12px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
-        .page { display: none; }
-        .page.active { display: block; }
-        
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .product-card { background: white; border-radius: 6px; border: 1px solid var(--milk-tea); overflow: hidden; display: flex; flex-direction: column; }
-        .product-img { width: 100%; height: 135px; object-fit: cover; background-color: var(--milk-tea); }
-        .product-body { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; gap: 6px; }
-        .product-title { font-size: 12px; font-weight: 400; line-height: 1.5; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .product-price { color: var(--rose-dark); font-weight: bold; font-size: 13px; }
-        
-        .select-spec { width: 100%; padding: 5px; border-radius: 4px; border: 1px solid var(--soft-gray); font-size: 11px; color: var(--mocha); background-color: white; outline: none; }
-        .qty-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-        .qty-input { width: 38px; text-align: center; padding: 4px; border-radius: 4px; border: 1px solid var(--soft-gray); font-size: 11px; color: var(--mocha); }
-        
-        .add-cart-btn { 
-            background: transparent; color: var(--rose-dark); border: 1px solid var(--rose-cream); padding: 5px; border-radius: 4px; font-size: 11px; letter-spacing: 1px; cursor: pointer; flex-grow: 1; transition: 0.2s;
-        }
-        .add-cart-btn:active { background: var(--milk-tea); }
-        .add-cart-btn:disabled { border-color: #eee; color: #ccc; background: #fafafa; }
-
-        .cart-item, .order-item { background: white; padding: 12px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--milk-tea); }
-        .order-meta { display: flex; justify-content: space-between; font-size: 11px; color: #9e908a; margin-bottom: 6px; align-items: center; }
-        
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
-        .badge.not-yet { background: #f2ece9; color: #9e908a; } 
-        .badge.success { background: #e6ede9; color: #6b8e76; } 
-        .badge.oos { background: #f9ebea; color: #c0392b; }     
-        
-        .note-input { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--soft-gray); box-sizing: border-box; font-size: 12px; margin-top: 8px; background: white; outline: none; }
-        .submit-all-btn { background: var(--rose-cream); color: white; border: none; width: 100%; padding: 12px; border-radius: 4px; font-size: 13px; letter-spacing: 2px; cursor: pointer; margin-top: 12px; }
-
-        .summary-card { background: white; border: 1px solid var(--rose-cream); padding: 16px; border-radius: 6px; text-align: center; margin-top: 12px; }
-        .summary-price { font-size: 20px; font-weight: bold; color: var(--rose-dark); margin: 4px 0; }
-
-        .guide-box { background: white; border-radius: 6px; padding: 18px; border: 1px solid var(--milk-tea); font-size: 13px; color: var(--mocha); line-height: 1.8; }
-        .guide-box h4 { margin: 16px 0 6px 0; color: var(--rose-dark); font-weight: 500; font-size: 13px; letter-spacing: 1px; }
-        .lele-btn { display: block; text-align: center; background: var(--rose-cream); color: white; border: none; padding: 12px; border-radius: 4px; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 16px; width: 100%; cursor: pointer; letter-spacing: 1px; }
-        .lele-btn:disabled { background: #e0e0e0; color: #aaa; }
-        
-        #global-status { text-align: center; padding: 6px; font-size: 11px; color: #9e908a; }
+        /* ... (保持你原本的 CSS 不變，這裡省略以節省篇幅) ... */
     </style>
 </head>
 <body>
-
-    <div class="nav-bar">
-        <div class="nav-item active" id="nav-products" onclick="switchPage('products')">連線商品</div>
-        <div class="nav-item" id="nav-orders" onclick="switchPage('orders')">我的訂單</div>
-        <div class="nav-item" id="nav-checkout" onclick="switchPage('checkout')">
-            我的結單
-            <div class="cart-badge" id="cart-badge-count" style="display:none;">0</div>
-        </div>
-        <div class="nav-item" id="nav-guide" onclick="switchPage('guide')">結單教學</div>
-    </div>
-
-    <div class="timer-banner" id="timer-display">正在同步連線時程...</div>
-
-    <div class="header">
-        <img id="userPicture" src="https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop" alt="Avatar">
-        <span id="userName">HuHuShop 呼來選品</span>
-    </div>
-
-    <div class="container">
-        <div id="global-status">連線線路準備就緒</div>
-
-        <div id="page-products" class="page active">
-            <div class="category-wrapper">
-                <div class="category-container">
-                    <div class="cat-tab active" id="cat-all" onclick="filterCategory('all')">所有商品</div>
-                    <div class="cat-tab" id="cat-normal" onclick="filterCategory('一般')">一般</div>
-                    <div class="cat-tab" id="cat-beauty" onclick="filterCategory('藥妝')">藥妝</div>
-                    <div class="cat-tab" id="cat-clothes" onclick="filterCategory('衣服')">衣服</div>
-                    <div class="cat-tab" id="cat-ip" onclick="filterCategory('IP')">IP</div>
-                </div>
-            </div>
-            <div id="products-list" class="products-grid"></div>
-        </div>
-
-        <div id="page-orders" class="page">
-            <h3 style="margin-top:0; font-size: 13px; font-weight: 400; letter-spacing: 1px;">現場已配單明細</h3>
-            <div id="orders-list">正在讀取配單紀錄...</div>
-        </div>
-
-        <div id="page-checkout" class="page">
-            <h3 style="margin-top:0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">待確認連線項目</h3>
-            <div id="cart-list"></div>
-            
-            <div class="summary-card">
-                <div style="font-size: 11px; letter-spacing: 1px;">預計結單總金額</div>
-                <div class="summary-price">NT$ <span id="checkout-total">0</span></div>
-                <input type="text" id="global-note" class="note-input" placeholder="新增備註（選填）">
-                <button class="submit-all-btn" id="submitAllBtn" onclick="submitFinalOrder()">確認無誤，送出訂單</button>
-            </div>
-        </div>
-
-        <div id="page-guide" class="page">
-            <h3 style="margin-top:0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">現場連線結單說明</h3>
-            <div class="guide-box">
-                <h4>1. 現場連線直接結單</h4>
-                <p>若您希望直接單獨結清本次採買商品，請於「我的訂單」確認採買狀態後，直接私訊 LINE 官方帳號 <b>@514pfcah</b> 索取賣貨便連結。請依照系統顯示之結單總額下單，並務必於備註欄填入您的綽號。</p>
-                
-                <h4>2. 轉入樂樂系統合併結單</h4>
-                <p>若您希望將本次連線成功的商品，與您先前在樂樂後台已有的訂單合併對帳打包，請點擊下方按鈕申請轉入。轉入後，此處的明細將由小幫手統一匯入樂樂後台與其他商品一同結單。</p>
-                
-                <button id="leleBtn" onclick="requestLeleMerge()" class="lele-btn">申請合併至樂樂系統</button>
-            </div>
-        </div>
-    </div>
-
-<script>
+    <script>
     const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
-    const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbx3gGQGYNs0EtM8hqbRxeUPR8kkQXy823jDXr5S0QdYRTJgQg0ls4tCeO8-wTNFuXc/exec"; 
+    // 【重要】請將下方網址換成你剛剛在 GAS 部署得到的 Web App URL (結尾是 /exec)
+    const MY_JSON_API_URL = "請貼上你的Web_App_網址_在這裡"; 
+    const MY_GAS_POST_URL = "https://script.google.com/macros/s/AKfycbx3gGQGYNs0EtM8hqbRxeUPR8kkQXy823jDXr5S0QdYRTJgQg0ls4tCeO8-wTNFuXc/exec"; 
 
-    // ⏳ 呼呼可以在這裡修改截止時間
-    const CLOSING_TIME = new Date("2026-06-15T23:59:59+08:00"); 
-
-    let userLineId = "Ubd06fad9646f3ac3d06b6565703bd30e"; 
-    let userLineName = "HuHu / 連線測試員";
-    
-    let productsCache = []; 
-    let currentSelectedCategory = "all";
-    let myCart = []; 
-    let loadedOrdersCache = []; 
-    let totalOrdersAmountCache = 0;
-    let isTimeOver = false;
-
-    function switchPage(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page-' + pageId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('nav-' + pageId).classList.add('active');
-        
-        if (pageId === 'orders') { loadUserOrders(); }
-        if (pageId === 'checkout') { renderCart(); }
-    }
-
-    function startTimer() {
-        const timerDisplay = document.getElementById("timer-display");
-        function updateTimer() {
-            const now = new Date();
-            const diff = CLOSING_TIME - now;
-            if (diff <= 0) {
-                isTimeOver = true;
-                timerDisplay.innerText = "本場連線已截止收單 / 感謝參與";
-                timerDisplay.style.backgroundColor = "#e0dcdb";
-                renderProductsHTML(productsCache);
-                clearInterval(timerInterval);
-                return;
-            }
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
-            timerDisplay.innerText = `距離收單截止還有：${days}天 ${hours}時 ${mins}分 ${secs}秒`;
-        }
-        updateTimer();
-        const timerInterval = setInterval(updateTimer, 1000);
-    }
-
-    async function initLiff() {
-        startTimer();
-        try {
-            if (typeof liff === "undefined") { loadProductsFromServer(); return; }
-            await liff.init({ liffId: MY_LIFF_ID });
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                userLineId = profile.userId;
-                userLineName = profile.displayName;
-                document.getElementById("userName").innerText = userLineName + " / 呼來選品";
-                if(profile.pictureUrl) document.getElementById("userPicture").src = profile.pictureUrl;
-            }
-            loadProductsFromServer();
-            silentLoadOrders(); 
-        } catch (err) { loadProductsFromServer(); }
-    }
+    // ... (你的 timer 邏輯) ...
 
     async function loadProductsFromServer() {
         const container = document.getElementById("products-list");
-        container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>同步現場線路中...</div>";
+        container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px;'>同步現場線路中...</div>";
         try {
-            const response = await fetch(`${MY_GAS_URL}?type=getProducts`);
-            productsCache = await response.json();
-            renderProductsHTML(productsCache);
-        } catch (err) { container.innerHTML = "<div style='grid-column: span 2; text-align:center; font-size:12px;'>網絡讀取逾時。</div>"; }
-    }
-
-    function filterCategory(catName) {
-        currentSelectedCategory = catName;
-        document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-        
-        const tabs = { 'all': 'cat-all', '一般': 'cat-normal', '藥妝': 'cat-beauty', '衣服': 'cat-clothes', 'IP': 'cat-ip' };
-        if (tabs[catName]) document.getElementById(tabs[catName]).classList.add('active');
-
-        let filtered = productsCache;
-        if (catName !== "all") { filtered = productsCache.filter(p => p.status === catName); }
-        renderProductsHTML(filtered);
-    }
-
-    function renderProductsHTML(list) {
-        const container = document.getElementById("products-list");
-        container.innerHTML = "";
-        
-        if(!list || list.length === 0) {
-            container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>此分類目前沒有商品。</div>";
-            return;
-        }
-
-        list.forEach((p, index) => {
-            const isOOS = p.status === "下架" || isTimeOver;
-            const btnText = isTimeOver ? "已截止" : (p.status === "下架" ? "已結單" : "加單");
-            const card = document.createElement("div");
-            card.className = "product-card";
+            // 改為呼叫我們剛剛建立的 JSON API
+            const response = await fetch(MY_JSON_API_URL);
+            const data = await response.json();
             
-            let specOptions = p.specs.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
-
-            card.innerHTML = `
-                <img class="product-img" src="${p.img}" alt="商品" onerror="this.src='https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop'">
-                <div class="product-body">
-                    <div class="product-title">${p.name}</div>
-                    <div class="product-price">NT$ ${p.price}</div>
-                    <select id="prod-spec-${index}" class="select-spec" ${isOOS ? 'disabled' : ''}>${specOptions}</select>
-                    <div class="qty-row">
-                        <input type="number" id="prod-qty-${index}" class="qty-input" value="1" min="1" max="99" ${isOOS ? 'disabled' : ''}>
-                        <button class="add-cart-btn" id="btn-${index}" onclick="addToCart('${p.name}', ${p.price}, ${index})" ${isOOS ? 'disabled' : ''}>
-                            ${btnText}
-                        </button>
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    function addToCart(pName, price, index) {
-        if(isTimeOver) { alert("本場連線已截止收單囉。"); return; }
-        const spec = document.getElementById(`prod-spec-${index}`).value;
-        const qty = parseInt(document.getElementById(`prod-qty-${index}`).value) || 1;
-        
-        let existing = myCart.find(item => item.productName === pName && item.spec === spec);
-        if(existing) { existing.qty += qty; } else { myCart.push({ productName: pName, price: price, spec: spec, qty: qty }); }
-        updateCartBadge();
-        alert(`已成功加單。`);
-    }
-
-    function updateCartBadge() {
-        const badge = document.getElementById("cart-badge-count");
-        let totalQty = myCart.reduce((sum, item) => sum + item.qty, 0);
-        if(totalQty > 0) { badge.innerText = totalQty; badge.style.display = "block"; } else { badge.style.display = "none"; }
-    }
-
-    function renderCart() {
-        const list = document.getElementById("cart-list");
-        const totalSpan = document.getElementById("checkout-total");
-        list.innerHTML = "";
-        
-        if(myCart.length === 0) {
-            list.innerHTML = "<div style='text-align:center; color:var(--mocha); font-size:12px; padding:30px;'>目前無待加單項目。</div>";
-            totalSpan.innerText = "0";
-            return;
+            // 這裡將 JSON 欄位重新映射到你的前端變數
+            // 你的 JSON 欄位名稱是: 名稱, 價格, 狀態, 類別, 規格, 圖片網址
+            productsCache = data.map(item => ({
+                name: item['名稱'],
+                price: item['價格'],
+                status: item['類別'], // 顯示用類別
+                img: item['圖片網址'],
+                specs: [item['規格']] // 規格
+            }));
+            
+            renderProductsHTML(productsCache);
+        } catch (err) { 
+            container.innerHTML = "<div style='grid-column: span 2; text-align:center;'>讀取失敗，請確認 Web App 已部署為所有人存取。</div>"; 
         }
-
-        let total = 0;
-        myCart.forEach((item, idx) => {
-            total += item.price * item.qty;
-            const div = document.createElement("div");
-            div.className = "cart-item";
-            div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:13px;">
-                    <div>${item.productName}</div>
-                    <div style="color:var(--rose-dark);">$${item.price * item.qty}</div>
-                </div>
-                <div style="font-size:12px; margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="opacity:0.7;">規格: ${item.spec}</span>
-                    <div>
-                        數量: <input type="number" value="${item.qty}" min="1" style="width:35px; text-align:center; border:1px solid #ccc;" onchange="updateCartQty(${idx}, this.value)">
-                        <button onclick="removeFromCart(${idx})" style="background:none; border:none; color:var(--rose-dark); cursor:pointer; margin-left:10px; font-size:12px;">移除</button>
-                    </div>
-                </div>
-            `;
-            list.appendChild(div);
-        });
-        totalSpan.innerText = total;
     }
 
-    function updateCartQty(idx, val) { myCart[idx].qty = parseInt(val) || 1; renderCart(); updateCartBadge(); }
-    function removeFromCart(idx) { myCart.splice(idx, 1); renderCart(); updateCartBadge(); }
-
-    async function submitFinalOrder() {
-        if(myCart.length === 0) return;
-        const btn = document.getElementById("submitAllBtn");
-        const globalNote = document.getElementById("global-note").value.trim();
-        btn.disabled = true;
-        btn.innerText = "正在傳送...";
-        let uploadItems = myCart.map(item => { return { productName: item.productName, spec: item.spec, qty: item.qty, note: globalNote }; });
-        try {
-            fetch(MY_GAS_URL, { method: "POST", body: JSON.stringify({ lineId: userLineId, lineName: userLineName, items: uploadItems }) });
-            alert("加單成功，請至我的訂單追蹤狀態。");
-            myCart = []; updateCartBadge(); switchPage('orders'); 
-        } catch(err) { alert("網路傳送失敗"); }
-        finally { btn.disabled = false; btn.innerText = "確認無誤，送出訂單"; }
-    }
-
-    async function requestLeleMerge() {
-        const leleBtn = document.getElementById("leleBtn");
-        let confirmedOrders = loadedOrdersCache.filter(o => o.status === "已購買" || o.status === "已收到");
-        if(confirmedOrders.length === 0) { alert("目前查無採買成功之商品，無法申請合併。"); return; }
-        leleBtn.disabled = true;
-        leleBtn.innerText = "打包中...";
-        let detailsString = confirmedOrders.map(o => `【${o.productName}/${o.spec} x${o.qty}】`).join(" , ");
-        try {
-            fetch(MY_GAS_URL, {
-                method: "POST", headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify({ action: "submitLeleMerge", lineId: userLineId, lineName: userLineName, itemDetails: detailsString, totalAmount: totalOrdersAmountCache, note: "買家網頁申請" })
-            });
-            alert("已傳送合併要求");
-            leleBtn.innerText = "已成功傳送合併要求";
-        } catch(err) { alert("要求失敗"); leleBtn.disabled = false; }
-    }
-
-    async function silentLoadOrders() {
-        try {
-            const response = await fetch(`${MY_GAS_URL}?type=getOrders&lineId=${userLineId}`);
-            const data = await response.json();
-            if (data.orders) { loadedOrdersCache = data.orders; totalOrdersAmountCache = data.total; }
-        } catch (e) {}
-    }
-
-    async function loadUserOrders() {
-        const orderContainer = document.getElementById("orders-list");
-        orderContainer.innerHTML = "<div style='text-align:center; padding:20px; color:var(--mocha); font-size:12px;'>同步最新狀態...</div>";
-        try {
-            const response = await fetch(`${MY_GAS_URL}?type=getOrders&lineId=${userLineId}`);
-            const data = await response.json();
-            orderContainer.innerHTML = "";
-            if (!data.orders || data.orders.length === 0) {
-                orderContainer.innerHTML = "<div style='text-align:center; color:var(--mocha); font-size:12px; padding:30px;'>目前無現場加單紀錄。</div>";
-                return;
-            }
-            loadedOrdersCache = data.orders; totalOrdersAmountCache = data.total;
-            data.orders.forEach(o => {
-                const item = document.createElement("div"); item.className = "order-item";
-                let statusClass = "not-yet";
-                if(o.status === "已購買" || o.status === "已收到") statusClass = "success";
-                if(o.status === "斷貨" || o.status === "沒買到") statusClass = "oos";
-                item.innerHTML = `<div class="order-meta"><span>${o.time}</span><span class="badge ${statusClass}">${o.status}</span></div><div style="font-weight:400; font-size:13px;">${o.productName}</div><div style="font-size:11px; opacity:0.7; margin-top:4px;">規格: ${o.spec} / 數量: ${o.qty}</div>${o.note ? `<div style="font-size:11px; background:#f4eae4; padding:6px; margin-top:6px;">備註: ${o.note}</div>` : ''}<div style="text-align:right; font-weight:bold; color:var(--rose-dark); font-size:13px; margin-top:2px;">$${o.price}</div>`;
-                orderContainer.appendChild(item);
-            });
-        } catch (err) { orderContainer.innerHTML = "讀取失敗。"; }
-    }
+    // ... (其他原有函數保持不變) ...
 
     window.addEventListener("load", initLiff);
 </script>
