@@ -18,29 +18,28 @@
 
     // ... (你的 timer 邏輯) ...
 
-    async function loadProductsFromServer() {
-        const container = document.getElementById("products-list");
-        container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px;'>同步現場線路中...</div>";
-        try {
-            // 改為呼叫我們剛剛建立的 JSON API
-            const response = await fetch(MY_JSON_API_URL);
-            const data = await response.json();
-            
-            // 這裡將 JSON 欄位重新映射到你的前端變數
-            // 你的 JSON 欄位名稱是: 名稱, 價格, 狀態, 類別, 規格, 圖片網址
-            productsCache = data.map(item => ({
-                name: item['名稱'],
-                price: item['價格'],
-                status: item['類別'], // 顯示用類別
-                img: item['圖片網址'],
-                specs: [item['規格']] // 規格
-            }));
-            
-            renderProductsHTML(productsCache);
-        } catch (err) { 
-            container.innerHTML = "<div style='grid-column: span 2; text-align:center;'>讀取失敗，請確認 Web App 已部署為所有人存取。</div>"; 
-        }
+async function loadProductsFromServer() {
+    const container = document.getElementById("products-list");
+    container.innerHTML = "<div style='grid-column: span 2; text-align:center; padding:20px;'>同步現場線路中...</div>";
+    try {
+        // 這裡直接使用你剛剛修改好的 MY_GAS_URL
+        const response = await fetch(MY_GAS_URL);
+        const data = await response.json();
+
+        // 重新映射欄位，確保對應到你的 Website 分頁設定
+        productsCache = data.map(item => ({
+            name: item['名稱'],
+            price: item['價格'],
+            status: item['類別'], 
+            img: item['圖片網址'],
+            specs: [item['規格']] 
+        }));
+
+        renderProductsHTML(productsCache);
+    } catch (err) { 
+        container.innerHTML = "<div style='grid-column: span 2; text-align:center;'>讀取失敗，請確認 Web App 已部署為「所有人」。</div>"; 
     }
+}
 
     // ... (其他原有函數保持不變) ...
 
