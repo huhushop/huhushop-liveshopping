@@ -10,38 +10,35 @@
     </style>
 </head>
 <body>
-    <script>
+   <script>
     const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
-    // 【重要】請將下方網址換成你剛剛在 GAS 部署得到的 Web App URL (結尾是 /exec)
-    const MY_JSON_API_URL = "請貼上你的Web_App_網址_在這裡"; 
-    const MY_GAS_POST_URL = "https://script.google.com/macros/s/AKfycbyEyZ1OioaGpS4BkhjDlCNpeghPvoXiODQKIalxQogQRof0OuECABkQm4B2vVfRL8VK/exec"; 
+    const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbyEyZ1OioaGpS4BkhjDlCNpeghPvoXiODQKIalxQogQRof0OuECABkQm4B2vVfRL8VK/exec"; 
 
-    // ... (你的 timer 邏輯) ...
-
-async function loadProductsFromServer() {
-    const container = document.getElementById("products-list");
-    try {
-        const response = await fetch(MY_GAS_URL); // 請確保這是你最新的部署連結
-        const data = await response.json();
-        
-        productsCache = data.map(item => ({
-            // 注意這裡要對應到你 Website 分頁的標題名稱
-            name: item['名稱'],
-            price: item['價格'],
-            status: item['類別'], 
-            img: item['圖片網址'], // 現在 G 是圖片
-            specs: [item['規格']]   // 現在 E 是規格
-        }));
-        
-        renderProductsHTML(productsCache);
-    } catch (err) { 
-        console.error(err);
+    // 確保函數被正確定義
+    async function initLiff() {
+        console.log("LIFF 初始化中...");
+        // 你的原有邏輯...
+        loadProductsFromServer();
     }
-}
 
-    // ... (其他原有函數保持不變) ...
+    async function loadProductsFromServer() {
+        console.log("嘗試連接 API...");
+        try {
+            const response = await fetch(MY_GAS_URL);
+            const data = await response.json();
+            // ... 你的 mapping 邏輯 ...
+            renderProductsHTML(productsCache);
+        } catch (err) {
+            console.error("載入失敗:", err);
+        }
+    }
 
-    window.addEventListener("load", initLiff);
+    // 確保網頁載入後才執行
+    window.addEventListener("load", function() {
+        if (typeof initLiff === 'function') {
+            initLiff();
+        } else {
+            console.error("initLiff 找不到！請檢查程式碼結構");
+        }
+    });
 </script>
-</body>
-</html>
