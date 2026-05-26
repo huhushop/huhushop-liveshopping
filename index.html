@@ -21,15 +21,28 @@
         loadProductsFromServer();
     }
 
-    async function loadProductsFromServer() {
+async function loadProductsFromServer() {
         console.log("嘗試連接 API...");
+        const container = document.getElementById("products-list");
         try {
             const response = await fetch(MY_GAS_URL);
             const data = await response.json();
-            // ... 你的 mapping 邏輯 ...
+            
+            // 這裡將我們 API 回傳的 JSON 欄位對應到網頁程式碼的變數
+            // 請確認你 Website 分頁的第一行標題真的是這些字
+            productsCache = data.map(item => ({
+                name: item['名稱'] || "未命名",
+                price: item['價格'] || 0,
+                status: item['類別'] || "一般", 
+                img: item['圖片網址'] || "",
+                specs: item['規格'] ? item['規格'].split(",") : ["單一規格"]
+            }));
+            
+            console.log("資料載入成功:", productsCache);
             renderProductsHTML(productsCache);
         } catch (err) {
             console.error("載入失敗:", err);
+            container.innerHTML = "<div style='grid-column: span 2; text-align:center;'>資料讀取錯誤，請確認部署權限。</div>";
         }
     }
 
