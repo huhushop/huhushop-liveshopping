@@ -6,31 +6,40 @@
     <title>HuHuShop 呼來選品</title>
     <script src="https://charset.net.tw/cdnjs/ajax/libs/liff/2.23.0/sdk.js"></script>
     <style>
-        /* ... (保持你原本的 CSS 不變，這裡省略以節省篇幅) ... */
+        /* (保留你原本精美的 CSS 樣式) */
+        body { font-family: sans-serif; background-color: #fbf7f4; margin: 0; padding: 0; color: #6d5f5a; }
+        .container { padding: 12px; max-width: 600px; margin: 0 auto; }
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .product-card { background: white; border-radius: 6px; border: 1px solid #f4eae4; overflow: hidden; padding: 10px; }
+        .product-img { width: 100%; height: 135px; object-fit: cover; }
+        .product-title { font-size: 12px; height: 36px; overflow: hidden; }
+        .product-price { color: #cc9f97; font-weight: bold; }
     </style>
 </head>
 <body>
-   <script>
-    const MY_LIFF_ID = "2010190278-1t2XrDnx"; 
+
+<div class="container">
+    <div id="products-list" class="products-grid">正在載入商品...</div>
+</div>
+
+<script>
+    // 1. 設定你的 Web App 連結 (請務必填入你在 GAS 部署後拿到的連結)
     const MY_GAS_URL = "https://script.google.com/macros/s/AKfycbyEyZ1OioaGpS4BkhjDlCNpeghPvoXiODQKIalxQogQRof0OuECABkQm4B2vVfRL8VK/exec"; 
+    
+    // 2. 頁面載入時執行
+    window.addEventListener("load", async () => {
+        await loadProductsFromServer();
+    });
 
-    // 確保函數被正確定義
-    async function initLiff() {
-        console.log("LIFF 初始化中...");
-        // 你的原有邏輯...
-        loadProductsFromServer();
-    }
-
-async function loadProductsFromServer() {
-        console.log("嘗試連接 API...");
+    // 3. 從 Google Sheet API 讀取資料
+    async function loadProductsFromServer() {
         const container = document.getElementById("products-list");
         try {
             const response = await fetch(MY_GAS_URL);
             const data = await response.json();
             
-            // 這裡將我們 API 回傳的 JSON 欄位對應到網頁程式碼的變數
-            // 請確認你 Website 分頁的第一行標題真的是這些字
-            productsCache = data.map(item => ({
+            // 資料對應：將 Website 分頁的標題列對應到程式變數
+            const productsCache = data.map(item => ({
                 name: item['名稱'] || "未命名",
                 price: item['價格'] || 0,
                 status: item['類別'] || "一般", 
@@ -38,20 +47,34 @@ async function loadProductsFromServer() {
                 specs: item['規格'] ? item['規格'].split(",") : ["單一規格"]
             }));
             
-            console.log("資料載入成功:", productsCache);
             renderProductsHTML(productsCache);
         } catch (err) {
             console.error("載入失敗:", err);
-            container.innerHTML = "<div style='grid-column: span 2; text-align:center;'>資料讀取錯誤，請確認部署權限。</div>";
+            container.innerHTML = "讀取失敗，請確認 Web App 已部署且為所有人存取。";
         }
     }
 
-    // 確保網頁載入後才執行
-    window.addEventListener("load", function() {
-        if (typeof initLiff === 'function') {
-            initLiff();
-        } else {
-            console.error("initLiff 找不到！請檢查程式碼結構");
-        }
-    });
+    // 4. 繪製商品介面
+    function renderProductsHTML(list) {
+        const container = document.getElementById("products-list");
+        container.innerHTML = "";
+        
+        list.forEach((p, index) => {
+            let specOptions = p.specs.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
+            const card = document.createElement("div");
+            card.className = "product-card";
+            card.innerHTML = `
+                <img class="product-img" src="${p.img}" alt="商品" onerror="this.src='https://images.unsplash.com/photo-1544816155-12df9643f363'">
+                <div class="product-body">
+                    <div class="product-title">${p.name}</div>
+                    <div class="product-price">NT$ ${p.price}</div>
+                    <select id="prod-spec-${index}">${specOptions}</select>
+                    <button onclick="alert('已加入: ${p.name}')">加單</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
 </script>
+</body>
+</html>
